@@ -30,7 +30,7 @@ export default function LoginPage() {
 
   // If already logged in, redirect to dashboard
   if (user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   const handleSubmit = async (e) => {
@@ -39,7 +39,7 @@ export default function LoginPage() {
     const success = await login(email, password);
     setSubmitting(false);
     if (success) {
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     }
   };
 

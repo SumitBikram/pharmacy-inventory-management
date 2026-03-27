@@ -29,7 +29,7 @@ import { DRAWER_WIDTH, DRAWER_WIDTH_COLLAPSED, ROLES } from '../../lib/constants
 import useAuthStore from '../../features/auth/authStore';
 
 const menuItems = [
-  { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+  { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Medicines', icon: <MedicineIcon />, path: '/medicines' },
   { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory', roles: [ROLES.ADMIN, ROLES.ACCOUNTANT] },
   { text: 'Billing', icon: <BillingIcon />, path: '/billing', roles: [ROLES.ADMIN, ROLES.SALESMAN] },

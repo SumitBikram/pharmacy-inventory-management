@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import theme from './app/theme';
 import ErrorBoundary from './components/shared/ErrorBoundary';
@@ -14,6 +14,7 @@ import SuppliersPage from './features/suppliers/SuppliersPage';
 import AlertsPage from './features/alerts/AlertsPage';
 import ReportsPage from './features/reports/ReportsPage';
 import UsersPage from './features/users/UsersPage';
+import NotFoundPage from './components/shared/NotFoundPage';
 import useAuthStore from './features/auth/authStore';
 import { ROLES } from './lib/constants';
 
@@ -35,7 +36,8 @@ function App() {
             {/* All authenticated routes */}
             <Route element={<AuthGuard />}>
               <Route element={<DashboardLayout />}>
-                <Route path="/" element={<DashboardPage />} />
+                <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/medicines" element={<MedicinesPage />} />
                 <Route path="/inventory" element={<InventoryPage />} />
                 <Route path="/alerts" element={<AlertsPage />} />
@@ -55,6 +57,9 @@ function App() {
                 <Route element={<AuthGuard allowedRoles={[ROLES.ADMIN, ROLES.ACCOUNTANT]} />}>
                   <Route path="/reports" element={<ReportsPage />} />
                 </Route>
+
+                {/* 404 inside layout for authenticated users */}
+                <Route path="*" element={<NotFoundPage />} />
               </Route>
             </Route>
           </Routes>
