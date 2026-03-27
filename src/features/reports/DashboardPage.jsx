@@ -1,12 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  CircularProgress,
-} from '@mui/material';
+import { Box, Grid, Card, CardContent, Typography, CircularProgress } from '@mui/material';
 import {
   LocalPharmacy,
   PointOfSale,
@@ -30,11 +23,46 @@ import { getDashboardStats, getMonthlySalesData } from './reportService';
 import useRoleAccess from '../../hooks/useRoleAccess';
 
 const allCards = [
-  { key: 'totalMedicines', title: 'Total Medicines', icon: <LocalPharmacy />, color: '#1B5E20', format: (v) => v, visibleTo: ['admin', 'accountant'] },
-  { key: 'todaySales', title: "Today's Sales", icon: <PointOfSale />, color: '#FF6F00', format: (v) => `\u20B9${v.toFixed(0)}`, visibleTo: ['admin', 'salesman'] },
-  { key: 'todayBillCount', title: "Today's Bills", icon: <Receipt />, color: '#1565C0', format: (v) => v, visibleTo: ['admin', 'salesman'] },
-  { key: 'lowStockCount', title: 'Low Stock Items', icon: <Inventory />, color: '#ED6C02', format: (v) => v, visibleTo: ['admin', 'accountant'] },
-  { key: 'expiringSoonCount', title: 'Expiring Soon', icon: <NotificationsActive />, color: '#D32F2F', format: (v) => v, visibleTo: ['admin', 'accountant'] },
+  {
+    key: 'totalMedicines',
+    title: 'Total Medicines',
+    icon: <LocalPharmacy />,
+    color: '#1B5E20',
+    format: (v) => v,
+    visibleTo: ['admin', 'accountant'],
+  },
+  {
+    key: 'todaySales',
+    title: "Today's Sales",
+    icon: <PointOfSale />,
+    color: '#FF6F00',
+    format: (v) => `\u20B9${v.toFixed(0)}`,
+    visibleTo: ['admin', 'salesman'],
+  },
+  {
+    key: 'todayBillCount',
+    title: "Today's Bills",
+    icon: <Receipt />,
+    color: '#1565C0',
+    format: (v) => v,
+    visibleTo: ['admin', 'salesman'],
+  },
+  {
+    key: 'lowStockCount',
+    title: 'Low Stock Items',
+    icon: <Inventory />,
+    color: '#ED6C02',
+    format: (v) => v,
+    visibleTo: ['admin', 'accountant'],
+  },
+  {
+    key: 'expiringSoonCount',
+    title: 'Expiring Soon',
+    icon: <NotificationsActive />,
+    color: '#D32F2F',
+    format: (v) => v,
+    visibleTo: ['admin', 'accountant'],
+  },
 ];
 
 export default function DashboardPage() {
@@ -120,12 +148,16 @@ export default function DashboardPage() {
         {showSalesChart && (
           <Grid size={{ xs: 12, md: showStockChart ? 7 : 12 }}>
             <Card sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>Monthly Sales</Typography>
+              <Typography variant="h6" gutterBottom>
+                Monthly Sales
+              </Typography>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
-                  <YAxis tickFormatter={(v) => `\u20B9${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
+                  <YAxis
+                    tickFormatter={(v) => `\u20B9${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+                  />
                   <Tooltip formatter={(value) => [`\u20B9${value.toFixed(2)}`, 'Sales']} />
                   <Bar dataKey="total" fill="#1B5E20" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -136,14 +168,23 @@ export default function DashboardPage() {
         {showStockChart && (
           <Grid size={{ xs: 12, md: showSalesChart ? 5 : 12 }}>
             <Card sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>Bills Per Month</Typography>
+              <Typography variant="h6" gutterBottom>
+                Bills Per Month
+              </Typography>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip />
-                  <Line type="monotone" dataKey="count" stroke="#FF6F00" strokeWidth={2} dot={{ r: 4 }} name="Bills" />
+                  <Line
+                    type="monotone"
+                    dataKey="count"
+                    stroke="#FF6F00"
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    name="Bills"
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </Card>

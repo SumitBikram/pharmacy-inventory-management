@@ -13,11 +13,7 @@ import {
   Chip,
 } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import {
-  WarningAmber,
-  EventBusy,
-  Settings,
-} from '@mui/icons-material';
+import { WarningAmber, EventBusy, Settings } from '@mui/icons-material';
 import { format, differenceInDays } from 'date-fns';
 import PageHeader from '../../components/shared/PageHeader';
 import DataTable from '../../components/shared/DataTable';
@@ -85,8 +81,20 @@ export default function AlertsPage() {
 
   const lowStockColumns = [
     { field: 'medicine_name', headerName: 'Medicine', flex: 1.3, minWidth: 160 },
-    { field: 'generic_name', headerName: 'Generic Name', flex: 1, minWidth: 130, valueFormatter: (v) => v || '—' },
-    { field: 'category_name', headerName: 'Category', flex: 0.7, minWidth: 100, valueFormatter: (v) => v || '—' },
+    {
+      field: 'generic_name',
+      headerName: 'Generic Name',
+      flex: 1,
+      minWidth: 130,
+      valueFormatter: (v) => v || '—',
+    },
+    {
+      field: 'category_name',
+      headerName: 'Category',
+      flex: 0.7,
+      minWidth: 100,
+      valueFormatter: (v) => v || '—',
+    },
     {
       field: 'total_stock',
       headerName: 'Stock',
@@ -163,8 +171,12 @@ export default function AlertsPage() {
             <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <WarningAmber color="warning" fontSize="large" />
               <Box>
-                <Typography variant="h4" fontWeight={700}>{lowStock.length}</Typography>
-                <Typography variant="body2" color="text.secondary">Low Stock Items</Typography>
+                <Typography variant="h4" fontWeight={700}>
+                  {lowStock.length}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Low Stock Items
+                </Typography>
               </Box>
             </CardContent>
           </Card>
@@ -174,8 +186,12 @@ export default function AlertsPage() {
             <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <EventBusy color="error" fontSize="large" />
               <Box>
-                <Typography variant="h4" fontWeight={700}>{expiringSoon.length}</Typography>
-                <Typography variant="body2" color="text.secondary">Expiring Soon</Typography>
+                <Typography variant="h4" fontWeight={700}>
+                  {expiringSoon.length}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Expiring Soon
+                </Typography>
               </Box>
             </CardContent>
           </Card>
@@ -185,8 +201,12 @@ export default function AlertsPage() {
             <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <EventBusy sx={{ color: 'error.dark' }} fontSize="large" />
               <Box>
-                <Typography variant="h4" fontWeight={700}>{expired.length}</Typography>
-                <Typography variant="body2" color="text.secondary">Expired Batches</Typography>
+                <Typography variant="h4" fontWeight={700}>
+                  {expired.length}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Expired Batches
+                </Typography>
               </Box>
             </CardContent>
           </Card>
@@ -199,7 +219,9 @@ export default function AlertsPage() {
             <Tab label={`Low Stock (${lowStock.length})`} value="low-stock" />
             <Tab label={`Expiring Soon (${expiringSoon.length})`} value="expiring" />
             <Tab label={`Expired (${expired.length})`} value="expired" />
-            {isAdmin && <Tab icon={<Settings />} iconPosition="start" label="Settings" value="settings" />}
+            {isAdmin && (
+              <Tab icon={<Settings />} iconPosition="start" label="Settings" value="settings" />
+            )}
           </TabList>
         </Box>
 
@@ -225,13 +247,20 @@ export default function AlertsPage() {
           <TabPanel value="settings" sx={{ p: 0 }}>
             <Card sx={{ maxWidth: 500 }}>
               <CardContent>
-                <Typography variant="h6" gutterBottom>Alert Thresholds</Typography>
+                <Typography variant="h6" gutterBottom>
+                  Alert Thresholds
+                </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                   <TextField
                     type="number"
                     label="Low Stock Threshold (units)"
                     value={settings.low_stock_threshold}
-                    onChange={(e) => setSettings((s) => ({ ...s, low_stock_threshold: parseInt(e.target.value, 10) || 0 }))}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        low_stock_threshold: parseInt(e.target.value, 10) || 0,
+                      }))
+                    }
                     helperText="Medicines with stock at or below this number will trigger a low stock alert"
                     slotProps={{ htmlInput: { min: 1 } }}
                   />
@@ -239,7 +268,12 @@ export default function AlertsPage() {
                     type="number"
                     label="Expiry Warning (days before expiry)"
                     value={settings.expiry_warning_days}
-                    onChange={(e) => setSettings((s) => ({ ...s, expiry_warning_days: parseInt(e.target.value, 10) || 0 }))}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        expiry_warning_days: parseInt(e.target.value, 10) || 0,
+                      }))
+                    }
                     helperText="Batches expiring within this many days will trigger an alert"
                     slotProps={{ htmlInput: { min: 1 } }}
                   />

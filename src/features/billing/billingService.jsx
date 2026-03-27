@@ -50,11 +50,10 @@ export async function createBill(bill, items, userId) {
 
   // 2. For each item, call FIFO deduction and create bill_items
   for (const item of items) {
-    const { data: allocations, error: fifoError } = await supabase
-      .rpc('deduct_stock_fifo', {
-        p_medicine_id: item.medicine_id,
-        p_quantity: item.quantity,
-      });
+    const { data: allocations, error: fifoError } = await supabase.rpc('deduct_stock_fifo', {
+      p_medicine_id: item.medicine_id,
+      p_quantity: item.quantity,
+    });
     if (fifoError) throw fifoError;
 
     // Create bill_items from FIFO allocations
@@ -67,9 +66,7 @@ export async function createBill(bill, items, userId) {
       total_price: alloc.qty_deducted * alloc.unit_price,
     }));
 
-    const { error: itemsError } = await supabase
-      .from('bill_items')
-      .insert(billItems);
+    const { error: itemsError } = await supabase.from('bill_items').insert(billItems);
     if (itemsError) throw itemsError;
   }
 
@@ -97,7 +94,8 @@ export async function getBills({ startDate, endDate } = {}) {
 export async function getBillDetails(billId) {
   const { data, error } = await supabase
     .from('bills')
-    .select(`
+    .select(
+      `
       *,
       created_by_user:users(full_name),
       items:bill_items(
@@ -105,7 +103,8 @@ export async function getBillDetails(billId) {
         medicine:medicines(id, name, generic_name),
         batch:stock_batches(batch_no, expiry_date)
       )
-    `)
+    `,
+    )
     .eq('id', billId)
     .single();
   if (error) throw error;

@@ -57,7 +57,9 @@ export async function getPurchaseEntries() {
 export async function getPurchaseEntry(id) {
   const { data, error } = await supabase
     .from('purchase_entries')
-    .select('*, supplier:suppliers(id, name), items:purchase_items(*, medicine:medicines(id, name))')
+    .select(
+      '*, supplier:suppliers(id, name), items:purchase_items(*, medicine:medicines(id, name))',
+    )
     .eq('id', id)
     .single();
   if (error) throw error;
@@ -92,9 +94,7 @@ export async function createPurchaseEntry(entry, items) {
     mrp: item.mrp || null,
   }));
 
-  const { error: itemsError } = await supabase
-    .from('purchase_items')
-    .insert(purchaseItems);
+  const { error: itemsError } = await supabase.from('purchase_items').insert(purchaseItems);
   if (itemsError) throw itemsError;
 
   // 3. Upsert stock batches (add to existing batch or create new)
@@ -109,7 +109,9 @@ export async function createPurchaseEntry(entry, items) {
 
     if (lookupError) {
       console.error('Stock batch lookup failed:', lookupError);
-      throw new Error(`Failed to check existing stock for batch ${item.batch_no}: ${lookupError.message}`);
+      throw new Error(
+        `Failed to check existing stock for batch ${item.batch_no}: ${lookupError.message}`,
+      );
     }
 
     if (existing) {
@@ -128,27 +130,29 @@ export async function createPurchaseEntry(entry, items) {
 
       if (updateError) {
         console.error('Stock batch update failed:', updateError);
-        throw new Error(`Failed to update stock batch for batch ${item.batch_no}: ${updateError.message}`);
+        throw new Error(
+          `Failed to update stock batch for batch ${item.batch_no}: ${updateError.message}`,
+        );
       }
     } else {
       // Create new batch
-      const { error: insertBatchError } = await supabase
-        .from('stock_batches')
-        .insert({
-          medicine_id: item.medicine_id,
-          batch_no: item.batch_no,
-          expiry_date: item.expiry_date,
-          quantity: item.quantity,
-          purchase_price: item.purchase_price,
-          selling_price: item.selling_price,
-          mrp: item.mrp || null,
-          supplier_id: entry.supplier_id,
-          purchase_entry_id: purchaseEntry.id,
-        });
+      const { error: insertBatchError } = await supabase.from('stock_batches').insert({
+        medicine_id: item.medicine_id,
+        batch_no: item.batch_no,
+        expiry_date: item.expiry_date,
+        quantity: item.quantity,
+        purchase_price: item.purchase_price,
+        selling_price: item.selling_price,
+        mrp: item.mrp || null,
+        supplier_id: entry.supplier_id,
+        purchase_entry_id: purchaseEntry.id,
+      });
 
       if (insertBatchError) {
         console.error('Stock batch insert failed:', insertBatchError);
-        throw new Error(`Failed to create stock batch for batch ${item.batch_no}: ${insertBatchError.message}`);
+        throw new Error(
+          `Failed to create stock batch for batch ${item.batch_no}: ${insertBatchError.message}`,
+        );
       }
     }
   }

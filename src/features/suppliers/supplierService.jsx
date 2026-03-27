@@ -1,13 +1,12 @@
 import { supabase } from '../../lib/supabase';
 
 export async function getSuppliers({ search = '', activeOnly = true } = {}) {
-  let query = supabase
-    .from('suppliers')
-    .select('*')
-    .order('name');
+  let query = supabase.from('suppliers').select('*').order('name');
 
   if (search) {
-    query = query.or(`name.ilike.%${search}%,contact_person.ilike.%${search}%,phone.ilike.%${search}%`);
+    query = query.or(
+      `name.ilike.%${search}%,contact_person.ilike.%${search}%,phone.ilike.%${search}%`,
+    );
   }
   if (activeOnly) {
     query = query.eq('is_active', true);
@@ -19,21 +18,13 @@ export async function getSuppliers({ search = '', activeOnly = true } = {}) {
 }
 
 export async function getSupplier(id) {
-  const { data, error } = await supabase
-    .from('suppliers')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const { data, error } = await supabase.from('suppliers').select('*').eq('id', id).single();
   if (error) throw error;
   return data;
 }
 
 export async function createSupplier(supplier) {
-  const { data, error } = await supabase
-    .from('suppliers')
-    .insert(supplier)
-    .select()
-    .single();
+  const { data, error } = await supabase.from('suppliers').insert(supplier).select().single();
   if (error) throw error;
   return data;
 }
@@ -50,9 +41,6 @@ export async function updateSupplier(id, updates) {
 }
 
 export async function deleteSupplier(id) {
-  const { error } = await supabase
-    .from('suppliers')
-    .update({ is_active: false })
-    .eq('id', id);
+  const { error } = await supabase.from('suppliers').update({ is_active: false }).eq('id', id);
   if (error) throw error;
 }

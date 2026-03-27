@@ -67,9 +67,11 @@ export default function CategoryManager({ open, onClose, categories, onRefresh }
       await deleteCategory(id);
       onRefresh();
     } catch (err) {
-      setError(err.message.includes('violates foreign key')
-        ? 'Cannot delete: category is in use by medicines'
-        : err.message);
+      setError(
+        err.message.includes('violates foreign key')
+          ? 'Cannot delete: category is in use by medicines'
+          : err.message,
+      );
     } finally {
       setLoading(false);
     }

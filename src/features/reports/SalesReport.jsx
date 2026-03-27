@@ -1,13 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  TextField,
-  Card,
-  CardContent,
-  Typography,
-  Grid,
-  Chip,
-} from '@mui/material';
+import { Box, TextField, Card, CardContent, Typography, Grid, Chip } from '@mui/material';
 import { format } from 'date-fns';
 import DataTable from '../../components/shared/DataTable';
 import { getDailySalesReport } from './reportService';
@@ -50,13 +42,21 @@ export default function SalesReport() {
       width: 100,
       valueFormatter: (v) => format(new Date(v), 'hh:mm a'),
     },
-    { field: 'customer_name', headerName: 'Customer', flex: 0.8, valueFormatter: (v) => v || 'Walk-in' },
+    {
+      field: 'customer_name',
+      headerName: 'Customer',
+      flex: 0.8,
+      valueFormatter: (v) => v || 'Walk-in',
+    },
     {
       field: 'total',
       headerName: 'Total',
       width: 110,
       renderCell: ({ value }) => (
-        <Typography fontWeight={600}>{'\u20B9'}{parseFloat(value).toFixed(2)}</Typography>
+        <Typography fontWeight={600}>
+          {'\u20B9'}
+          {parseFloat(value).toFixed(2)}
+        </Typography>
       ),
     },
     {
@@ -64,7 +64,13 @@ export default function SalesReport() {
       headerName: 'Payment',
       width: 100,
       renderCell: ({ value }) => (
-        <Chip label={value} size="small" color={paymentColors[value] || 'default'} variant="outlined" sx={{ textTransform: 'capitalize' }} />
+        <Chip
+          label={value}
+          size="small"
+          color={paymentColors[value] || 'default'}
+          variant="outlined"
+          sx={{ textTransform: 'capitalize' }}
+        />
       ),
     },
     {
@@ -93,9 +99,12 @@ export default function SalesReport() {
           <Grid size={{ xs: 6, sm: 3 }}>
             <Card>
               <CardContent>
-                <Typography variant="body2" color="text.secondary">Total Sales</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Total Sales
+                </Typography>
                 <Typography variant="h5" fontWeight={700} color="primary">
-                  {'\u20B9'}{summary.totalSales.toFixed(2)}
+                  {'\u20B9'}
+                  {summary.totalSales.toFixed(2)}
                 </Typography>
               </CardContent>
             </Card>
@@ -103,17 +112,24 @@ export default function SalesReport() {
           <Grid size={{ xs: 6, sm: 3 }}>
             <Card>
               <CardContent>
-                <Typography variant="body2" color="text.secondary">Bills</Typography>
-                <Typography variant="h5" fontWeight={700}>{summary.billCount}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Bills
+                </Typography>
+                <Typography variant="h5" fontWeight={700}>
+                  {summary.billCount}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid size={{ xs: 6, sm: 3 }}>
             <Card>
               <CardContent>
-                <Typography variant="body2" color="text.secondary">Discount Given</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Discount Given
+                </Typography>
                 <Typography variant="h5" fontWeight={700} color="error">
-                  {'\u20B9'}{summary.totalDiscount.toFixed(2)}
+                  {'\u20B9'}
+                  {summary.totalDiscount.toFixed(2)}
                 </Typography>
               </CardContent>
             </Card>
@@ -121,7 +137,9 @@ export default function SalesReport() {
           <Grid size={{ xs: 6, sm: 3 }}>
             <Card>
               <CardContent>
-                <Typography variant="body2" color="text.secondary">Payment Split</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Payment Split
+                </Typography>
                 <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
                   {Object.entries(summary.byPayment).map(([method, data]) => (
                     <Chip

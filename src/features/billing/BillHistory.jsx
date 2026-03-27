@@ -1,10 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Box,
-  TextField,
-  Chip,
-  Typography,
-} from '@mui/material';
+import { Box, TextField, Chip, Typography } from '@mui/material';
 import { format } from 'date-fns';
 import DataTable from '../../components/shared/DataTable';
 import BillDetailDialog from './BillDetailDialog';
@@ -60,14 +55,17 @@ export default function BillHistory() {
       headerName: 'Total',
       width: 110,
       renderCell: ({ value }) => (
-        <Typography fontWeight={600}>{'\u20B9'}{parseFloat(value).toFixed(2)}</Typography>
+        <Typography fontWeight={600}>
+          {'\u20B9'}
+          {parseFloat(value).toFixed(2)}
+        </Typography>
       ),
     },
     {
       field: 'discount',
       headerName: 'Discount',
       width: 100,
-      valueFormatter: (v) => parseFloat(v) > 0 ? `\u20B9${parseFloat(v).toFixed(2)}` : '—',
+      valueFormatter: (v) => (parseFloat(v) > 0 ? `\u20B9${parseFloat(v).toFixed(2)}` : '—'),
     },
     {
       field: 'payment_method',

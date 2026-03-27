@@ -79,8 +79,6 @@ export default function MedicinesPage() {
       setFormOpen(false);
       setEditingMedicine(null);
       fetchData();
-    } catch (err) {
-      throw err; // re-throw so form can display it
     } finally {
       setSaving(false);
     }
@@ -124,7 +122,9 @@ export default function MedicinesPage() {
       minWidth: 180,
       renderCell: ({ value }) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-          <Typography variant="body2" fontWeight={600}>{value}</Typography>
+          <Typography variant="body2" fontWeight={600}>
+            {value}
+          </Typography>
         </Box>
       ),
     },
@@ -173,8 +173,7 @@ export default function MedicinesPage() {
       field: 'prescription_required',
       headerName: 'Rx',
       width: 70,
-      renderCell: ({ value }) =>
-        value ? <Chip label="Rx" size="small" color="warning" /> : '—',
+      renderCell: ({ value }) => (value ? <Chip label="Rx" size="small" color="warning" /> : '—'),
     },
     ...(canManageMedicines
       ? [
@@ -269,7 +268,11 @@ export default function MedicinesPage() {
           {categories.map((cat) => {
             const colors = getCategoryColor(cat.name);
             return (
-              <MenuItem key={cat.id} value={cat.id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <MenuItem
+                key={cat.id}
+                value={cat.id}
+                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+              >
                 <Box
                   sx={{
                     width: 12,

@@ -9,11 +9,7 @@ import {
   MenuItem,
   Avatar,
 } from '@mui/material';
-import {
-  Menu as MenuIcon,
-  AccountCircle,
-  Logout,
-} from '@mui/icons-material';
+import { Menu as MenuIcon, AccountCircle, Logout } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DRAWER_WIDTH } from '../../lib/constants';
@@ -45,11 +41,7 @@ export default function Topbar({ onMenuToggle }) {
       }}
     >
       <Toolbar>
-        <IconButton
-          edge="start"
-          onClick={onMenuToggle}
-          sx={{ mr: 2, display: { md: 'none' } }}
-        >
+        <IconButton edge="start" onClick={onMenuToggle} sx={{ mr: 2, display: { md: 'none' } }}>
           <MenuIcon />
         </IconButton>
 

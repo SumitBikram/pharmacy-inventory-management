@@ -11,12 +11,7 @@ import {
   IconButton,
   CircularProgress,
 } from '@mui/material';
-import {
-  Visibility,
-  VisibilityOff,
-  LocationOn,
-  WhatsApp,
-} from '@mui/icons-material';
+import { Visibility, VisibilityOff, LocationOn, WhatsApp } from '@mui/icons-material';
 import { Navigate, useNavigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
@@ -57,12 +52,21 @@ export default function LoginPage() {
       <Card sx={{ maxWidth: 420, width: '100%' }}>
         <CardContent sx={{ p: 4 }}>
           <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <Box component="img" src="/logo.png" alt="Che Health Care" sx={{ height: 64, mb: 1, display: 'block', mx: 'auto' }} />
+            <Box
+              component="img"
+              src="/logo.png"
+              alt="Che Health Care"
+              sx={{ height: 64, mb: 1, display: 'block', mx: 'auto' }}
+            />
             <Box sx={{ display: 'inline-block', textAlign: 'right' }}>
               <Typography variant="h5" fontWeight={700} color="primary">
                 Che Health Care
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: -0.5 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', mt: -0.5 }}
+              >
                 চে হেলথ্ কেয়ার
               </Typography>
             </Box>
@@ -121,11 +125,21 @@ export default function LoginPage() {
             </Button>
           </Box>
 
-          <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Box
+            sx={{ mt: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}
+          >
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+            >
               <LocationOn fontSize="small" /> Ramnagar, Purba Medinipur
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+            >
               <WhatsApp fontSize="small" color="success" /> +91 8641887754
             </Typography>
           </Box>

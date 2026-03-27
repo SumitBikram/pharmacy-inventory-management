@@ -171,12 +171,7 @@ export default function BillingPage() {
                   </TableBody>
                 </Table>
               </TableContainer>
-              <Button
-                size="small"
-                startIcon={<Add />}
-                onClick={addItem}
-                sx={{ mt: 1 }}
-              >
+              <Button size="small" startIcon={<Add />} onClick={addItem} sx={{ mt: 1 }}>
                 Add Item
               </Button>
             </Grid>
@@ -194,7 +189,9 @@ export default function BillingPage() {
                 size="large"
                 onClick={handleCreateBill}
                 disabled={saving}
-                startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <PointOfSale />}
+                startIcon={
+                  saving ? <CircularProgress size={20} color="inherit" /> : <PointOfSale />
+                }
                 sx={{ mt: 2 }}
               >
                 {saving ? 'Creating Bill...' : `Create Bill \u2014 \u20B9${total.toFixed(2)}`}
