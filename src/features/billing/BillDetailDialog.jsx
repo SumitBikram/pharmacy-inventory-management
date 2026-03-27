@@ -75,7 +75,11 @@ export default function BillDetailDialog({ open, billId, onClose }) {
           <Typography variant="body2">
             <strong>Billed by:</strong> {bill.created_by_user?.full_name || '—'}
           </Typography>
-          <Chip label={paymentLabel[bill.payment_method] || bill.payment_method} size="small" variant="outlined" />
+          <Chip
+            label={paymentLabel[bill.payment_method] || bill.payment_method}
+            size="small"
+            variant="outlined"
+          />
         </Box>
 
         {/* Items table */}
@@ -109,8 +113,14 @@ export default function BillDetailDialog({ open, billId, onClose }) {
                       : '—'}
                   </TableCell>
                   <TableCell align="right">{item.quantity}</TableCell>
-                  <TableCell align="right">{'\u20B9'}{parseFloat(item.unit_price).toFixed(2)}</TableCell>
-                  <TableCell align="right">{'\u20B9'}{parseFloat(item.total_price).toFixed(2)}</TableCell>
+                  <TableCell align="right">
+                    {'\u20B9'}
+                    {parseFloat(item.unit_price).toFixed(2)}
+                  </TableCell>
+                  <TableCell align="right">
+                    {'\u20B9'}
+                    {parseFloat(item.total_price).toFixed(2)}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -120,16 +130,19 @@ export default function BillDetailDialog({ open, billId, onClose }) {
         {/* Totals */}
         <Box sx={{ mt: 2, textAlign: 'right' }}>
           <Typography variant="body2" color="text.secondary">
-            Subtotal: {'\u20B9'}{parseFloat(bill.subtotal).toFixed(2)}
+            Subtotal: {'\u20B9'}
+            {parseFloat(bill.subtotal).toFixed(2)}
           </Typography>
           {parseFloat(bill.discount) > 0 && (
             <Typography variant="body2" color="error.main">
-              Discount: -{'\u20B9'}{parseFloat(bill.discount).toFixed(2)}
+              Discount: -{'\u20B9'}
+              {parseFloat(bill.discount).toFixed(2)}
             </Typography>
           )}
           <Divider sx={{ my: 1, ml: 'auto', width: 200 }} />
           <Typography variant="h6" fontWeight={700} color="primary">
-            Total: {'\u20B9'}{parseFloat(bill.total).toFixed(2)}
+            Total: {'\u20B9'}
+            {parseFloat(bill.total).toFixed(2)}
           </Typography>
         </Box>
 

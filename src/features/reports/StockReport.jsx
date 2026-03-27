@@ -24,9 +24,27 @@ export default function StockReport() {
 
   const columns = [
     { field: 'medicine_name', headerName: 'Medicine', flex: 1.3, minWidth: 160 },
-    { field: 'generic_name', headerName: 'Generic Name', flex: 1, minWidth: 130, valueFormatter: (v) => v || '—' },
-    { field: 'category_name', headerName: 'Category', flex: 0.7, minWidth: 100, valueFormatter: (v) => v || '—' },
-    { field: 'manufacturer', headerName: 'Manufacturer', flex: 0.8, minWidth: 120, valueFormatter: (v) => v || '—' },
+    {
+      field: 'generic_name',
+      headerName: 'Generic Name',
+      flex: 1,
+      minWidth: 130,
+      valueFormatter: (v) => v || '—',
+    },
+    {
+      field: 'category_name',
+      headerName: 'Category',
+      flex: 0.7,
+      minWidth: 100,
+      valueFormatter: (v) => v || '—',
+    },
+    {
+      field: 'manufacturer',
+      headerName: 'Manufacturer',
+      flex: 0.8,
+      minWidth: 120,
+      valueFormatter: (v) => v || '—',
+    },
     {
       field: 'total_stock',
       headerName: 'Total Stock',
@@ -41,7 +59,7 @@ export default function StockReport() {
       field: 'earliest_expiry',
       headerName: 'Nearest Expiry',
       width: 140,
-      valueFormatter: (v) => v ? format(new Date(v), 'dd MMM yyyy') : '—',
+      valueFormatter: (v) => (v ? format(new Date(v), 'dd MMM yyyy') : '—'),
     },
   ];
 

@@ -31,11 +31,26 @@ import useAuthStore from '../../features/auth/authStore';
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Medicines', icon: <MedicineIcon />, path: '/medicines' },
-  { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory', roles: [ROLES.ADMIN, ROLES.ACCOUNTANT] },
-  { text: 'Billing', icon: <BillingIcon />, path: '/billing', roles: [ROLES.ADMIN, ROLES.SALESMAN] },
+  {
+    text: 'Inventory',
+    icon: <InventoryIcon />,
+    path: '/inventory',
+    roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+  },
+  {
+    text: 'Billing',
+    icon: <BillingIcon />,
+    path: '/billing',
+    roles: [ROLES.ADMIN, ROLES.SALESMAN],
+  },
   { text: 'Suppliers', icon: <SupplierIcon />, path: '/suppliers', roles: [ROLES.ADMIN] },
   { text: 'Alerts', icon: <AlertIcon />, path: '/alerts' },
-  { text: 'Reports', icon: <ReportIcon />, path: '/reports', roles: [ROLES.ADMIN, ROLES.ACCOUNTANT] },
+  {
+    text: 'Reports',
+    icon: <ReportIcon />,
+    path: '/reports',
+    roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+  },
   { text: 'Users', icon: <UsersIcon />, path: '/users', roles: [ROLES.ADMIN] },
 ];
 
@@ -47,9 +62,7 @@ export default function Sidebar({ mobileOpen, onClose, collapsed, onToggleCollap
   const profile = useAuthStore((s) => s.profile);
   const userRole = profile?.role;
 
-  const visibleItems = menuItems.filter(
-    (item) => !item.roles || item.roles.includes(userRole)
-  );
+  const visibleItems = menuItems.filter((item) => !item.roles || item.roles.includes(userRole));
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -73,7 +86,12 @@ export default function Sidebar({ mobileOpen, onClose, collapsed, onToggleCollap
               overflow: 'hidden',
             }}
           >
-            <Box component="img" src="/logo.png" alt="Che Health Care" sx={{ height: 32, flexShrink: 0 }} />
+            <Box
+              component="img"
+              src="/logo.png"
+              alt="Che Health Care"
+              sx={{ height: 32, flexShrink: 0 }}
+            />
             {!isCollapsed && (
               <Typography variant="h6" color="primary" noWrap>
                 Che Health Care
@@ -124,7 +142,9 @@ export default function Sidebar({ mobileOpen, onClose, collapsed, onToggleCollap
         {isDesktop && (
           <>
             <Divider />
-            <Box sx={{ display: 'flex', justifyContent: isCollapsed ? 'center' : 'flex-end', p: 1 }}>
+            <Box
+              sx={{ display: 'flex', justifyContent: isCollapsed ? 'center' : 'flex-end', p: 1 }}
+            >
               <IconButton onClick={onToggleCollapse} size="small">
                 {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
               </IconButton>
@@ -136,7 +156,10 @@ export default function Sidebar({ mobileOpen, onClose, collapsed, onToggleCollap
   };
 
   return (
-    <Box component="nav" sx={{ width: { md: currentWidth }, flexShrink: { md: 0 }, transition: drawerTransition }}>
+    <Box
+      component="nav"
+      sx={{ width: { md: currentWidth }, flexShrink: { md: 0 }, transition: drawerTransition }}
+    >
       {/* Mobile drawer */}
       <Drawer
         variant="temporary"

@@ -13,12 +13,7 @@ import PageHeader from '../../components/shared/PageHeader';
 import DataTable from '../../components/shared/DataTable';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import SupplierForm from './SupplierForm';
-import {
-  getSuppliers,
-  createSupplier,
-  updateSupplier,
-  deleteSupplier,
-} from './supplierService';
+import { getSuppliers, createSupplier, updateSupplier, deleteSupplier } from './supplierService';
 import useRoleAccess from '../../hooks/useRoleAccess';
 
 export default function SuppliersPage() {
@@ -67,8 +62,6 @@ export default function SuppliersPage() {
       setFormOpen(false);
       setEditingSupplier(null);
       fetchData();
-    } catch (err) {
-      throw err;
     } finally {
       setSaving(false);
     }
@@ -116,7 +109,9 @@ export default function SuppliersPage() {
             <Phone fontSize="small" color="action" />
             {value}
           </Box>
-        ) : '—',
+        ) : (
+          '—'
+        ),
     },
     {
       field: 'email',
@@ -129,7 +124,9 @@ export default function SuppliersPage() {
             <Email fontSize="small" color="action" />
             {value}
           </Box>
-        ) : '—',
+        ) : (
+          '—'
+        ),
     },
     {
       field: 'gst_no',

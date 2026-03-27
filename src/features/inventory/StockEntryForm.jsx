@@ -198,7 +198,9 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
           <Divider sx={{ mb: 2 }} />
 
           {/* Items table */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Box
+            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}
+          >
             <Typography variant="subtitle1" fontWeight={600}>
               Items
             </Typography>
@@ -297,7 +299,9 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" fontWeight={600}>
-                        {((parseFloat(item.quantity) || 0) * (parseFloat(item.purchase_price) || 0)).toFixed(2)}
+                        {(
+                          (parseFloat(item.quantity) || 0) * (parseFloat(item.purchase_price) || 0)
+                        ).toFixed(2)}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -332,7 +336,8 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
                 Total Amount
               </Typography>
               <Typography variant="h5" fontWeight={700} color="primary">
-                {'\u20B9'}{calculateTotal().toFixed(2)}
+                {'\u20B9'}
+                {calculateTotal().toFixed(2)}
               </Typography>
             </Box>
           </Box>

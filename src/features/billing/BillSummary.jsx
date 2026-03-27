@@ -1,11 +1,4 @@
-import {
-  Box,
-  TextField,
-  MenuItem,
-  Typography,
-  Divider,
-  Grid,
-} from '@mui/material';
+import { Box, TextField, MenuItem, Typography, Divider, Grid } from '@mui/material';
 import { PAYMENT_METHODS } from '../../lib/constants';
 
 const paymentOptions = [
@@ -85,20 +78,30 @@ export default function BillSummary({ bill, onUpdate, subtotal }) {
       <Divider sx={{ my: 2 }} />
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-        <Typography variant="body2" color="text.secondary">Subtotal</Typography>
-        <Typography variant="body2">{'\u20B9'}{subtotal.toFixed(2)}</Typography>
+        <Typography variant="body2" color="text.secondary">
+          Subtotal
+        </Typography>
+        <Typography variant="body2">
+          {'\u20B9'}
+          {subtotal.toFixed(2)}
+        </Typography>
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-        <Typography variant="body2" color="text.secondary">Discount</Typography>
+        <Typography variant="body2" color="text.secondary">
+          Discount
+        </Typography>
         <Typography variant="body2" color="error.main">
           {discount > 0 ? `-\u20B9${discount.toFixed(2)}` : '\u20B90.00'}
         </Typography>
       </Box>
       <Divider sx={{ my: 1 }} />
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant="h6" fontWeight={700}>Total</Typography>
+        <Typography variant="h6" fontWeight={700}>
+          Total
+        </Typography>
         <Typography variant="h6" fontWeight={700} color="primary">
-          {'\u20B9'}{total.toFixed(2)}
+          {'\u20B9'}
+          {total.toFixed(2)}
         </Typography>
       </Box>
     </Box>

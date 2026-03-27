@@ -9,7 +9,9 @@ const useAuthStore = create((set, get) => ({
 
   initialize: async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session?.user) {
         const profile = await get().fetchProfile(session.user.id);
         set({ user: session.user, profile, loading: false });
@@ -31,11 +33,7 @@ const useAuthStore = create((set, get) => ({
   },
 
   fetchProfile: async (userId) => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    const { data, error } = await supabase.from('users').select('*').eq('id', userId).single();
     if (error) {
       console.error('Error fetching profile:', error.message);
       return null;

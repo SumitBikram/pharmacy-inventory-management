@@ -81,7 +81,7 @@ export async function getMonthlySalesData(monthsBack = 6) {
       const total = data?.reduce((sum, b) => sum + parseFloat(b.total), 0) || 0;
       const count = data?.length || 0;
       return { month: m.label, total, count };
-    })
+    }),
   );
 
   return results;

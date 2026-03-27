@@ -44,8 +44,16 @@ export default function ExpiryReport() {
       width: 140,
       renderCell: ({ value }) => {
         const days = differenceInDays(new Date(value), new Date());
-        const color = days < 0 ? 'error' : days <= 30 ? 'error' : days <= 90 ? 'warning' : 'success';
-        return <Chip label={format(new Date(value), 'dd MMM yyyy')} size="small" color={color} variant="outlined" />;
+        const color =
+          days < 0 ? 'error' : days <= 30 ? 'error' : days <= 90 ? 'warning' : 'success';
+        return (
+          <Chip
+            label={format(new Date(value), 'dd MMM yyyy')}
+            size="small"
+            color={color}
+            variant="outlined"
+          />
+        );
       },
     },
     {
@@ -57,7 +65,15 @@ export default function ExpiryReport() {
         <Typography
           variant="body2"
           fontWeight={600}
-          color={value < 0 ? 'error.main' : value <= 30 ? 'error.main' : value <= 90 ? 'warning.main' : 'success.main'}
+          color={
+            value < 0
+              ? 'error.main'
+              : value <= 30
+                ? 'error.main'
+                : value <= 90
+                  ? 'warning.main'
+                  : 'success.main'
+          }
         >
           {value < 0 ? `${Math.abs(value)}d overdue` : `${value}d`}
         </Typography>

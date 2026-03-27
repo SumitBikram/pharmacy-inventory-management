@@ -7,7 +7,15 @@ import {
   Button,
 } from '@mui/material';
 
-export default function ConfirmDialog({ open, title, message, onConfirm, onCancel, confirmText = 'Confirm', severity = 'error' }) {
+export default function ConfirmDialog({
+  open,
+  title,
+  message,
+  onConfirm,
+  onCancel,
+  confirmText = 'Confirm',
+  severity = 'error',
+}) {
   const colorMap = { error: 'error', warning: 'warning', info: 'primary' };
   return (
     <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>

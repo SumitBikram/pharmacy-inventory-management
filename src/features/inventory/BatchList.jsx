@@ -68,7 +68,7 @@ export default function BatchList({ batches, loading }) {
       field: 'mrp',
       headerName: 'MRP',
       width: 100,
-      valueFormatter: (value) => value ? `\u20B9${parseFloat(value).toFixed(2)}` : '—',
+      valueFormatter: (value) => (value ? `\u20B9${parseFloat(value).toFixed(2)}` : '—'),
     },
     {
       field: 'supplier',

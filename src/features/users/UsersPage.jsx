@@ -1,25 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Box,
-  IconButton,
-  Tooltip,
-  Chip,
-  Alert,
-  Snackbar,
-} from '@mui/material';
+import { Box, IconButton, Tooltip, Chip, Alert, Snackbar } from '@mui/material';
 import { Edit, PersonOff, PersonAdd } from '@mui/icons-material';
 import { format } from 'date-fns';
 import PageHeader from '../../components/shared/PageHeader';
 import DataTable from '../../components/shared/DataTable';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import UserForm from './UserForm';
-import {
-  getUsers,
-  createUser,
-  updateUser,
-  deactivateUser,
-  activateUser,
-} from './userService';
+import { getUsers, createUser, updateUser, deactivateUser, activateUser } from './userService';
 import useAuthStore from '../auth/authStore';
 
 const roleColors = { admin: 'error', accountant: 'primary', salesman: 'success' };
@@ -54,25 +41,18 @@ export default function UsersPage() {
   }, [fetchData]);
 
   const handleSave = async (formData) => {
-    console.log('[UsersPage] handleSave called with:', formData);
-    console.log('[UsersPage] editingUser:', editingUser);
     setSaving(true);
     try {
       if (editingUser) {
         await updateUser(editingUser.id, formData);
         showSnackbar('User updated');
       } else {
-        console.log('[UsersPage] Calling createUser...');
-        const result = await createUser(formData);
-        console.log('[UsersPage] createUser result:', result);
+        await createUser(formData);
         showSnackbar('User created successfully');
       }
       setFormOpen(false);
       setEditingUser(null);
       fetchData();
-    } catch (err) {
-      console.error('[UsersPage] handleSave error:', err);
-      throw err;
     } finally {
       setSaving(false);
     }
@@ -159,7 +139,13 @@ export default function UsersPage() {
         return (
           <Box>
             <Tooltip title="Edit">
-              <IconButton size="small" onClick={() => { setEditingUser(row); setFormOpen(true); }}>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setEditingUser(row);
+                  setFormOpen(true);
+                }}
+              >
                 <Edit fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -186,14 +172,20 @@ export default function UsersPage() {
         title="User Management"
         subtitle="Manage staff accounts and roles"
         actionLabel="Add User"
-        onAction={() => { setEditingUser(null); setFormOpen(true); }}
+        onAction={() => {
+          setEditingUser(null);
+          setFormOpen(true);
+        }}
       />
 
       <DataTable rows={users} columns={columns} loading={loading} />
 
       <UserForm
         open={formOpen}
-        onClose={() => { setFormOpen(false); setEditingUser(null); }}
+        onClose={() => {
+          setFormOpen(false);
+          setEditingUser(null);
+        }}
         onSave={handleSave}
         user={editingUser}
         loading={saving}

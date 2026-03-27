@@ -89,7 +89,9 @@ export default function InventoryPage() {
 
   const handleSavePurchase = async (entry, items) => {
     if (!user?.id) {
-      throw new Error('You must be logged in to save a purchase entry. Please refresh and try again.');
+      throw new Error(
+        'You must be logged in to save a purchase entry. Please refresh and try again.',
+      );
     }
     setSaving(true);
     try {
@@ -99,7 +101,10 @@ export default function InventoryPage() {
       fetchData();
     } catch (err) {
       if (err.message?.includes('row-level security') || err.code === '42501') {
-        throw new Error('Permission denied: your account role does not allow managing purchases. Contact an admin.');
+        throw new Error(
+          'Permission denied: your account role does not allow managing purchases. Contact an admin.',
+          { cause: err },
+        );
       }
       throw err;
     } finally {
@@ -109,9 +114,27 @@ export default function InventoryPage() {
 
   const summaryColumns = [
     { field: 'medicine_name', headerName: 'Medicine', flex: 1.3, minWidth: 160 },
-    { field: 'generic_name', headerName: 'Generic Name', flex: 1, minWidth: 130, valueFormatter: (v) => v || '—' },
-    { field: 'category_name', headerName: 'Category', flex: 0.7, minWidth: 110, valueFormatter: (v) => v || '—' },
-    { field: 'manufacturer', headerName: 'Manufacturer', flex: 0.8, minWidth: 120, valueFormatter: (v) => v || '—' },
+    {
+      field: 'generic_name',
+      headerName: 'Generic Name',
+      flex: 1,
+      minWidth: 130,
+      valueFormatter: (v) => v || '—',
+    },
+    {
+      field: 'category_name',
+      headerName: 'Category',
+      flex: 0.7,
+      minWidth: 110,
+      valueFormatter: (v) => v || '—',
+    },
+    {
+      field: 'manufacturer',
+      headerName: 'Manufacturer',
+      flex: 0.8,
+      minWidth: 120,
+      valueFormatter: (v) => v || '—',
+    },
     {
       field: 'total_stock',
       headerName: 'Total Stock',
@@ -126,7 +149,7 @@ export default function InventoryPage() {
       field: 'earliest_expiry',
       headerName: 'Nearest Expiry',
       width: 130,
-      valueFormatter: (v) => v ? format(new Date(v), 'dd MMM yyyy') : '—',
+      valueFormatter: (v) => (v ? format(new Date(v), 'dd MMM yyyy') : '—'),
     },
   ];
 
@@ -137,7 +160,13 @@ export default function InventoryPage() {
       width: 130,
       valueFormatter: (v) => format(new Date(v), 'dd MMM yyyy'),
     },
-    { field: 'invoice_no', headerName: 'Invoice No.', flex: 0.6, minWidth: 110, valueFormatter: (v) => v || '—' },
+    {
+      field: 'invoice_no',
+      headerName: 'Invoice No.',
+      flex: 0.6,
+      minWidth: 110,
+      valueFormatter: (v) => v || '—',
+    },
     {
       field: 'supplier',
       headerName: 'Supplier',
@@ -158,7 +187,13 @@ export default function InventoryPage() {
       minWidth: 110,
       valueGetter: (value) => value?.full_name || '—',
     },
-    { field: 'notes', headerName: 'Notes', flex: 0.8, minWidth: 120, valueFormatter: (v) => v || '—' },
+    {
+      field: 'notes',
+      headerName: 'Notes',
+      flex: 0.8,
+      minWidth: 120,
+      valueFormatter: (v) => v || '—',
+    },
   ];
 
   return (
@@ -198,7 +233,13 @@ export default function InventoryPage() {
               }}
             />
             <FormControlLabel
-              control={<Switch checked={showEmpty} onChange={(e) => setShowEmpty(e.target.checked)} size="small" />}
+              control={
+                <Switch
+                  checked={showEmpty}
+                  onChange={(e) => setShowEmpty(e.target.checked)}
+                  size="small"
+                />
+              }
               label="Show empty batches"
             />
           </Box>

@@ -13,11 +13,7 @@ export default function PageHeader({ title, subtitle, actionLabel, onAction, act
         )}
       </Box>
       {actionLabel && (
-        <Button
-          variant="contained"
-          startIcon={actionIcon || <AddIcon />}
-          onClick={onAction}
-        >
+        <Button variant="contained" startIcon={actionIcon || <AddIcon />} onClick={onAction}>
           {actionLabel}
         </Button>
       )}

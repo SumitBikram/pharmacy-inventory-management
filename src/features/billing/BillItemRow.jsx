@@ -96,9 +96,15 @@ export default function BillItemRow({ item, index, onUpdate, onRemove, canRemove
           size="small"
           options={options}
           getOptionLabel={(opt) =>
-            typeof opt === 'string' ? opt : `${opt.name}${opt.generic_name ? ` (${opt.generic_name})` : ''}`
+            typeof opt === 'string'
+              ? opt
+              : `${opt.name}${opt.generic_name ? ` (${opt.generic_name})` : ''}`
           }
-          value={item.medicine_id ? { id: item.medicine_id, name: item.medicine_name, generic_name: item.generic_name } : null}
+          value={
+            item.medicine_id
+              ? { id: item.medicine_id, name: item.medicine_name, generic_name: item.generic_name }
+              : null
+          }
           onChange={handleMedicineSelect}
           onInputChange={(_, val) => setSearchText(val)}
           loading={searching}
@@ -143,7 +149,9 @@ export default function BillItemRow({ item, index, onUpdate, onRemove, canRemove
       </TableCell>
       <TableCell align="right">
         <Typography variant="body2">
-          {item.unit_price || unitPrice ? `\u20B9${(item.unit_price || unitPrice).toFixed(2)}` : '—'}
+          {item.unit_price || unitPrice
+            ? `\u20B9${(item.unit_price || unitPrice).toFixed(2)}`
+            : '—'}
         </Typography>
       </TableCell>
       <TableCell align="right">
@@ -152,7 +160,12 @@ export default function BillItemRow({ item, index, onUpdate, onRemove, canRemove
         </Typography>
       </TableCell>
       <TableCell>
-        <IconButton size="small" color="error" onClick={() => onRemove(index)} disabled={!canRemove}>
+        <IconButton
+          size="small"
+          color="error"
+          onClick={() => onRemove(index)}
+          disabled={!canRemove}
+        >
           <Delete fontSize="small" />
         </IconButton>
       </TableCell>
