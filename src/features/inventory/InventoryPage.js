@@ -88,13 +88,19 @@ export default function InventoryPage() {
   }, []);
 
   const handleSavePurchase = async (entry, items) => {
+    if (!user?.id) {
+      throw new Error('You must be logged in to save a purchase entry. Please refresh and try again.');
+    }
     setSaving(true);
     try {
-      await createPurchaseEntry({ ...entry, created_by: user?.id }, items);
+      await createPurchaseEntry({ ...entry, created_by: user.id }, items);
       showSnackbar('Purchase entry saved and stock updated');
       setFormOpen(false);
       fetchData();
     } catch (err) {
+      if (err.message?.includes('row-level security') || err.code === '42501') {
+        throw new Error('Permission denied: your account role does not allow managing purchases. Contact an admin.');
+      }
       throw err;
     } finally {
       setSaving(false);

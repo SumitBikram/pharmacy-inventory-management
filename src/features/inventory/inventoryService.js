@@ -100,16 +100,21 @@ export async function createPurchaseEntry(entry, items) {
   // 3. Upsert stock batches (add to existing batch or create new)
   for (const item of items) {
     // Check if batch already exists for this medicine
-    const { data: existing } = await supabase
+    const { data: existing, error: lookupError } = await supabase
       .from('stock_batches')
       .select('id, quantity')
       .eq('medicine_id', item.medicine_id)
       .eq('batch_no', item.batch_no)
       .maybeSingle();
 
+    if (lookupError) {
+      console.error('Stock batch lookup failed:', lookupError);
+      throw new Error(`Failed to check existing stock for batch ${item.batch_no}: ${lookupError.message}`);
+    }
+
     if (existing) {
       // Update existing batch quantity
-      await supabase
+      const { error: updateError } = await supabase
         .from('stock_batches')
         .update({
           quantity: existing.quantity + item.quantity,
@@ -120,9 +125,14 @@ export async function createPurchaseEntry(entry, items) {
           purchase_entry_id: purchaseEntry.id,
         })
         .eq('id', existing.id);
+
+      if (updateError) {
+        console.error('Stock batch update failed:', updateError);
+        throw new Error(`Failed to update stock batch for batch ${item.batch_no}: ${updateError.message}`);
+      }
     } else {
       // Create new batch
-      await supabase
+      const { error: insertBatchError } = await supabase
         .from('stock_batches')
         .insert({
           medicine_id: item.medicine_id,
@@ -135,6 +145,11 @@ export async function createPurchaseEntry(entry, items) {
           supplier_id: entry.supplier_id,
           purchase_entry_id: purchaseEntry.id,
         });
+
+      if (insertBatchError) {
+        console.error('Stock batch insert failed:', insertBatchError);
+        throw new Error(`Failed to create stock batch for batch ${item.batch_no}: ${insertBatchError.message}`);
+      }
     }
   }
 
