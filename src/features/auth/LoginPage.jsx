@@ -10,8 +10,11 @@ import {
   InputAdornment,
   IconButton,
   CircularProgress,
+  Tooltip,
 } from '@mui/material';
 import { Visibility, VisibilityOff, LocationOn, WhatsApp } from '@mui/icons-material';
+import { SiGmail, SiGithub, SiInstagram, SiX } from 'react-icons/si';
+import { FaLinkedin } from 'react-icons/fa6';
 import { Navigate, useNavigate } from 'react-router-dom';
 import useAuthStore from './authStore';
 
@@ -43,12 +46,14 @@ export default function LoginPage() {
       sx={{
         minHeight: '100vh',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'background.default',
         p: 2,
       }}
     >
+      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
       <Card sx={{ maxWidth: 420, width: '100%' }}>
         <CardContent sx={{ p: 4 }}>
           <Box sx={{ textAlign: 'center', mb: 3 }}>
@@ -144,7 +149,44 @@ export default function LoginPage() {
             </Typography>
           </Box>
         </CardContent>
-      </Card>
+        </Card>
+      </Box>
+      <Typography variant="caption" color="text.secondary">
+        Meet the Developer
+      </Typography>
+      <Box sx={{ mt: 'auto', pb: 2, textAlign: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, flexWrap: 'wrap'}}>
+          {[
+            { icon: <SiGmail size={16} />, href: 'mailto:dev.sumitbm@gmail.com', label: 'Email', hoverColor: '#EA4335' },
+            { icon: <SiGithub size={16} />, href: 'https://github.com/SumitBikram', label: 'GitHub', hoverColor: '#181717' },
+            { icon: <SiInstagram size={16} />, href: 'https://www.instagram.com/rony_sumit/', label: 'Instagram', hoverColor: '#E4405F' },
+            { icon: <FaLinkedin size={16} />, href: 'https://www.linkedin.com/in/sumit-bikram-maity-225358102/', label: 'LinkedIn', hoverColor: '#0A66C2' },
+            { icon: <SiX size={16} />, href: 'https://x.com/sumit_bikram', label: 'X', hoverColor: '#000' },
+          ].map(({ icon, href, label, hoverColor }) => (
+            <Tooltip key={label} title={label} arrow enterDelay={1000}>
+              <IconButton
+                component="a"
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                size="small"
+                aria-label={label}
+                sx={{
+                  color: 'text.secondary',
+                  transition: 'color 0.2s',
+                  p: 0.75,
+                  '&:hover': { color: hoverColor },
+                }}
+              >
+                {icon}
+              </IconButton>
+            </Tooltip>
+          ))}
+        </Box>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+          © Copyright {new Date().getFullYear()}. All rights reserved.
+        </Typography>
+      </Box>
     </Box>
   );
 }
