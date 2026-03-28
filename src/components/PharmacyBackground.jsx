@@ -3,7 +3,9 @@ import { Box } from '@mui/material';
 import pharmacyIcons from '../assets/icons/pharmacy';
 
 // Pre-defined rotations to give variety without randomness looking clumpy
-const ROTATIONS = [0, 15, -20, 45, -10, 30, -35, 60, -45, 20, -15, 50, 10, -25, 40, -5, 25, -40, 35, -30, 55, -50];
+const ROTATIONS = [
+  0, 15, -20, 45, -10, 30, -35, 60, -45, 20, -15, 50, 10, -25, 40, -5, 25, -40, 35, -30, 55, -50,
+];
 
 export default function PharmacyBackground() {
   const icons = useMemo(() => {
@@ -19,8 +21,8 @@ export default function PharmacyBackground() {
         // Offset every other row for a staggered look
         const offsetX = row % 2 === 0 ? 0 : cellW / 2;
         // Small jitter within each cell to avoid a rigid grid
-        const jitterX = ((iconIdx * 7 + 3) % 11 - 5) * 0.8;
-        const jitterY = ((iconIdx * 13 + 5) % 11 - 5) * 0.8;
+        const jitterX = (((iconIdx * 7 + 3) % 11) - 5) * 0.8;
+        const jitterY = (((iconIdx * 13 + 5) % 11) - 5) * 0.8;
 
         items.push({
           src: pharmacyIcons[iconIdx % pharmacyIcons.length],

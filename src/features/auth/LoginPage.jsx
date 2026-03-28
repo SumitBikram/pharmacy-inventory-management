@@ -57,114 +57,165 @@ export default function LoginPage() {
     >
       <PharmacyBackground />
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-      <Card sx={{ maxWidth: 420, width: '100%', boxShadow: 6 }}>
-        <CardContent sx={{ p: 4 }}>
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
+        <Card sx={{ maxWidth: 420, width: '100%', boxShadow: 6 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Box sx={{ textAlign: 'center', mb: 3 }}>
+              <Box
+                component="img"
+                src="/logo.png"
+                alt="Che Health Care"
+                sx={{ height: 64, mb: 1, display: 'block', mx: 'auto' }}
+              />
+              <Box sx={{ display: 'inline-block', textAlign: 'right' }}>
+                <Typography variant="h5" fontWeight={700} color="primary">
+                  Che Health Care
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: 'block', mt: -0.5 }}
+                >
+                  চে হেলথ্ কেয়ার
+                </Typography>
+              </Box>
+            </Box>
+
+            {error && (
+              <Alert severity="error" onClose={clearError} sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+
+            <Box component="form" onSubmit={handleSubmit}>
+              <TextField
+                fullWidth
+                label="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                fullWidth
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                sx={{ mb: 3 }}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                          size="small"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                disabled={submitting}
+                startIcon={submitting ? <CircularProgress size={20} color="inherit" /> : null}
+              >
+                {submitting ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </Box>
+
             <Box
-              component="img"
-              src="/logo.png"
-              alt="Che Health Care"
-              sx={{ height: 64, mb: 1, display: 'block', mx: 'auto' }}
-            />
-            <Box sx={{ display: 'inline-block', textAlign: 'right' }}>
-              <Typography variant="h5" fontWeight={700} color="primary">
-                Che Health Care
+              sx={{
+                mt: 3,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 0.5,
+              }}
+            >
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+              >
+                <LocationOn fontSize="small" /> Ramnagar, Purba Medinipur
               </Typography>
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ display: 'block', mt: -0.5 }}
+                sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
               >
-                চে হেলথ্ কেয়ার
+                <WhatsApp fontSize="small" color="success" /> +91 8641887754
               </Typography>
             </Box>
-          </Box>
-
-          {error && (
-            <Alert severity="error" onClose={clearError} sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
-          <Box component="form" onSubmit={handleSubmit}>
-            <TextField
-              fullWidth
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoFocus
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              sx={{ mb: 3 }}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                        size="small"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              size="large"
-              disabled={submitting}
-              startIcon={submitting ? <CircularProgress size={20} color="inherit" /> : null}
-            >
-              {submitting ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </Box>
-
-          <Box
-            sx={{ mt: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}
-          >
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-            >
-              <LocationOn fontSize="small" /> Ramnagar, Purba Medinipur
-            </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-            >
-              <WhatsApp fontSize="small" color="success" /> +91 8641887754
-            </Typography>
-          </Box>
-        </CardContent>
+          </CardContent>
         </Card>
       </Box>
-      <Box sx={{ mt: 'auto', pb: 2, textAlign: 'center', position: 'relative', zIndex: 1, backgroundColor: 'background.default', borderRadius: 2, px: 3, py: 1.5 }}>
+      <Box
+        sx={{
+          mt: 'auto',
+          pb: 2,
+          textAlign: 'center',
+          position: 'relative',
+          zIndex: 1,
+          backgroundColor: 'background.default',
+          borderRadius: 2,
+          px: 3,
+          py: 1.5,
+        }}
+      >
         <Typography variant="caption" color="text.secondary">
           Meet the Developer
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, flexWrap: 'wrap'}}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1,
+            flexWrap: 'wrap',
+          }}
+        >
           {[
-            { icon: <SiGmail size={16} />, href: 'mailto:dev.sumitbm@gmail.com', label: 'Email', hoverColor: '#EA4335' },
-            { icon: <SiGithub size={16} />, href: 'https://github.com/SumitBikram', label: 'GitHub', hoverColor: '#181717' },
-            { icon: <SiInstagram size={16} />, href: 'https://www.instagram.com/rony_sumit/', label: 'Instagram', hoverColor: '#E4405F' },
-            { icon: <FaLinkedin size={16} />, href: 'https://www.linkedin.com/in/sumit-bikram-maity-225358102/', label: 'LinkedIn', hoverColor: '#0A66C2' },
-            { icon: <SiX size={16} />, href: 'https://x.com/sumit_bikram', label: 'X', hoverColor: '#000' },
+            {
+              icon: <SiGmail size={16} />,
+              href: 'mailto:dev.sumitbm@gmail.com',
+              label: 'Email',
+              hoverColor: '#EA4335',
+            },
+            {
+              icon: <SiGithub size={16} />,
+              href: 'https://github.com/SumitBikram',
+              label: 'GitHub',
+              hoverColor: '#181717',
+            },
+            {
+              icon: <SiInstagram size={16} />,
+              href: 'https://www.instagram.com/rony_sumit/',
+              label: 'Instagram',
+              hoverColor: '#E4405F',
+            },
+            {
+              icon: <FaLinkedin size={16} />,
+              href: 'https://www.linkedin.com/in/sumit-bikram-maity-225358102/',
+              label: 'LinkedIn',
+              hoverColor: '#0A66C2',
+            },
+            {
+              icon: <SiX size={16} />,
+              href: 'https://x.com/sumit_bikram',
+              label: 'X',
+              hoverColor: '#000',
+            },
           ].map(({ icon, href, label, hoverColor }) => (
             <Tooltip key={label} title={label} arrow enterDelay={1000}>
               <IconButton
