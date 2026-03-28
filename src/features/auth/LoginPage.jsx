@@ -17,6 +17,7 @@ import { SiGmail, SiGithub, SiInstagram, SiX } from 'react-icons/si';
 import { FaLinkedin } from 'react-icons/fa6';
 import { Navigate, useNavigate } from 'react-router-dom';
 import useAuthStore from './authStore';
+import PharmacyBackground from '../../components/PharmacyBackground';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -50,11 +51,13 @@ export default function LoginPage() {
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'background.default',
+        position: 'relative',
         p: 2,
       }}
     >
-      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-      <Card sx={{ maxWidth: 420, width: '100%' }}>
+      <PharmacyBackground />
+      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+      <Card sx={{ maxWidth: 420, width: '100%', boxShadow: 6 }}>
         <CardContent sx={{ p: 4 }}>
           <Box sx={{ textAlign: 'center', mb: 3 }}>
             <Box
@@ -151,10 +154,10 @@ export default function LoginPage() {
         </CardContent>
         </Card>
       </Box>
-      <Typography variant="caption" color="text.secondary">
-        Meet the Developer
-      </Typography>
-      <Box sx={{ mt: 'auto', pb: 2, textAlign: 'center' }}>
+      <Box sx={{ mt: 'auto', pb: 2, textAlign: 'center', position: 'relative', zIndex: 1, backgroundColor: 'background.default', borderRadius: 2, px: 3, py: 1.5 }}>
+        <Typography variant="caption" color="text.secondary">
+          Meet the Developer
+        </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, flexWrap: 'wrap'}}>
           {[
             { icon: <SiGmail size={16} />, href: 'mailto:dev.sumitbm@gmail.com', label: 'Email', hoverColor: '#EA4335' },
