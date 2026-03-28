@@ -128,7 +128,14 @@ export default function ProfilePage() {
         <Grid size={{ xs: 12, md: 7 }}>
           <Card>
             <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 2,
+                }}
+              >
                 <Typography variant="h6">Profile Details</Typography>
                 {!editing ? (
                   <Button startIcon={<Edit />} size="small" onClick={handleStartEdit}>
@@ -136,11 +143,7 @@ export default function ProfilePage() {
                   </Button>
                 ) : (
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button
-                      startIcon={<Cancel />}
-                      size="small"
-                      onClick={handleCancelEdit}
-                    >
+                    <Button startIcon={<Cancel />} size="small" onClick={handleCancelEdit}>
                       Cancel
                     </Button>
                     <Button
@@ -226,9 +229,7 @@ export default function ProfilePage() {
                   label="New Password"
                   type={showNewPassword ? 'text' : 'password'}
                   value={passwordForm.new_password}
-                  onChange={(e) =>
-                    setPasswordForm((f) => ({ ...f, new_password: e.target.value }))
-                  }
+                  onChange={(e) => setPasswordForm((f) => ({ ...f, new_password: e.target.value }))}
                   helperText="Minimum 6 characters"
                   slotProps={{
                     input: {
