@@ -11,11 +11,7 @@ import {
   Divider,
   ListItemIcon,
 } from '@mui/material';
-import {
-  Menu as MenuIcon,
-  Person,
-  Logout,
-} from '@mui/icons-material';
+import { Menu as MenuIcon, Person, Logout } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DRAWER_WIDTH } from '../../lib/constants';
