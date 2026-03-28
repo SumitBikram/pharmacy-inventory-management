@@ -1,6 +1,7 @@
 {
   "short_name": "Che Health Care",
-  "name": "Che Health Care",
+  "name": "Che Health Care | Pharmacy Inventory Management",
+  "description": "Che Health Care's in-house pharmacy inventory management system — track stock, manage purchases, and streamline pharmacy operations efficiently.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,12 +9,7 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
+      "src": "logo.png",
       "type": "image/png",
       "sizes": "512x512"
     }
