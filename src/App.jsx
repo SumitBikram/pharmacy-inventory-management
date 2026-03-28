@@ -14,6 +14,7 @@ import SuppliersPage from './features/suppliers/SuppliersPage';
 import AlertsPage from './features/alerts/AlertsPage';
 import ReportsPage from './features/reports/ReportsPage';
 import UsersPage from './features/users/UsersPage';
+import ProfilePage from './features/auth/ProfilePage';
 import NotFoundPage from './components/shared/NotFoundPage';
 import useAuthStore from './features/auth/authStore';
 import { ROLES } from './lib/constants';
@@ -38,6 +39,7 @@ function App() {
               <Route element={<DashboardLayout />}>
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/medicines" element={<MedicinesPage />} />
                 <Route path="/inventory" element={<InventoryPage />} />
                 <Route path="/alerts" element={<AlertsPage />} />
