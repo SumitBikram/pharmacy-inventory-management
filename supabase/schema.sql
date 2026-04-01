@@ -69,6 +69,7 @@ CREATE TABLE public.medicines (
   manufacturer TEXT,
   composition TEXT,
   hsn_code TEXT,
+  packing TEXT,
   unit TEXT DEFAULT 'pcs',
   prescription_required BOOLEAN DEFAULT false,
   is_active BOOLEAN DEFAULT true,
@@ -123,8 +124,10 @@ CREATE TABLE public.stock_batches (
   expiry_date DATE NOT NULL,
   quantity INTEGER NOT NULL DEFAULT 0 CHECK (quantity >= 0),
   purchase_price NUMERIC(10,2) NOT NULL,
-  selling_price NUMERIC(10,2) NOT NULL,
+  selling_price NUMERIC(10,2),
   mrp NUMERIC(10,2),
+  packing TEXT,
+  gst_percent NUMERIC(5,2) DEFAULT 0,
   supplier_id UUID REFERENCES public.suppliers(id) ON DELETE SET NULL,
   purchase_entry_id UUID, -- linked after purchase_entries table is created
   created_at TIMESTAMPTZ DEFAULT now(),
@@ -183,8 +186,13 @@ CREATE TABLE public.purchase_items (
   expiry_date DATE NOT NULL,
   quantity INTEGER NOT NULL CHECK (quantity > 0),
   purchase_price NUMERIC(10,2) NOT NULL,
-  selling_price NUMERIC(10,2) NOT NULL,
-  mrp NUMERIC(10,2)
+  selling_price NUMERIC(10,2),
+  mrp NUMERIC(10,2),
+  packing TEXT,
+  discount NUMERIC(5,2) DEFAULT 0,
+  schedule_percent NUMERIC(5,2) DEFAULT 0,
+  gst_percent NUMERIC(5,2) DEFAULT 0,
+  old_mrp NUMERIC(10,2)
 );
 
 ALTER TABLE public.purchase_items ENABLE ROW LEVEL SECURITY;
@@ -319,7 +327,7 @@ DECLARE
   batch RECORD;
 BEGIN
   FOR batch IN
-    SELECT sb.id, sb.batch_no, sb.quantity, sb.selling_price
+    SELECT sb.id, sb.batch_no, sb.quantity, sb.selling_price, sb.mrp
     FROM public.stock_batches sb
     WHERE sb.medicine_id = p_medicine_id
       AND sb.quantity > 0
@@ -337,7 +345,7 @@ BEGIN
       batch_id := batch.id;
       batch_no := batch.batch_no;
       qty_deducted := remaining;
-      unit_price := batch.selling_price;
+      unit_price := COALESCE(batch.selling_price, batch.mrp, 0);
       remaining := 0;
       RETURN NEXT;
     ELSE
@@ -346,7 +354,7 @@ BEGIN
       batch_id := batch.id;
       batch_no := batch.batch_no;
       qty_deducted := batch.quantity;
-      unit_price := batch.selling_price;
+      unit_price := COALESCE(batch.selling_price, batch.mrp, 0);
       remaining := remaining - batch.quantity;
       RETURN NEXT;
     END IF;

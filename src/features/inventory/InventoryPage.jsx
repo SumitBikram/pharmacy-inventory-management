@@ -13,6 +13,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Search } from '@mui/icons-material';
 import PageHeader from '../../components/shared/PageHeader';
 import BatchList from './BatchList';
+import BatchPricingDialog from './BatchPricingDialog';
 import StockEntryForm from './StockEntryForm';
 import DataTable from '../../components/shared/DataTable';
 import {
@@ -42,6 +43,7 @@ export default function InventoryPage() {
   const [search, setSearch] = useState('');
   const [showEmpty, setShowEmpty] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+  const [pricingBatch, setPricingBatch] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   const showSnackbar = (message, severity = 'success') => {
@@ -113,7 +115,16 @@ export default function InventoryPage() {
   };
 
   const summaryColumns = [
-    { field: 'medicine_name', headerName: 'Medicine', flex: 1.3, minWidth: 160 },
+    {
+      field: 'medicine_name',
+      headerName: 'Medicine',
+      flex: 1.3,
+      minWidth: 160,
+      valueGetter: (_, row) => {
+        if (!row.packing) return row.medicine_name;
+        return `${row.medicine_name} (${row.packing}${row.unit ? ' ' + row.unit : ''})`;
+      },
+    },
     {
       field: 'generic_name',
       headerName: 'Generic Name',
@@ -243,7 +254,11 @@ export default function InventoryPage() {
               label="Show empty batches"
             />
           </Box>
-          <BatchList batches={batches} loading={loading} />
+          <BatchList
+            batches={batches}
+            loading={loading}
+            onEditPricing={canManageStock ? (batch) => setPricingBatch(batch) : undefined}
+          />
         </TabPanel>
 
         <TabPanel value="summary" sx={{ p: 0 }}>
@@ -260,6 +275,17 @@ export default function InventoryPage() {
           <DataTable rows={purchases} columns={purchaseColumns} loading={loading} />
         </TabPanel>
       </TabContext>
+
+      <BatchPricingDialog
+        open={!!pricingBatch}
+        batch={pricingBatch}
+        onClose={() => setPricingBatch(null)}
+        onSaved={() => {
+          setPricingBatch(null);
+          showSnackbar('Batch pricing updated');
+          fetchData();
+        }}
+      />
 
       <StockEntryForm
         open={formOpen}

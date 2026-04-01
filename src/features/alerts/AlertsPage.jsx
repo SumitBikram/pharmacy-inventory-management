@@ -79,8 +79,19 @@ export default function AlertsPage() {
     }
   };
 
+  const getMedicineDisplay = (_, row) => {
+    if (!row.packing) return row.medicine_name;
+    return `${row.medicine_name} (${row.packing}${row.unit ? ' ' + row.unit : ''})`;
+  };
+
   const lowStockColumns = [
-    { field: 'medicine_name', headerName: 'Medicine', flex: 1.3, minWidth: 160 },
+    {
+      field: 'medicine_name',
+      headerName: 'Medicine',
+      flex: 1.3,
+      minWidth: 160,
+      valueGetter: getMedicineDisplay,
+    },
     {
       field: 'generic_name',
       headerName: 'Generic Name',
@@ -117,6 +128,7 @@ export default function AlertsPage() {
       headerName: 'Medicine',
       flex: 1.3,
       minWidth: 160,
+      valueGetter: getMedicineDisplay,
     },
     { field: 'batch_no', headerName: 'Batch', flex: 0.6, minWidth: 100 },
     {
@@ -156,7 +168,7 @@ export default function AlertsPage() {
       field: 'selling_price',
       headerName: 'Selling Price',
       width: 110,
-      valueFormatter: (v) => `\u20B9${parseFloat(v).toFixed(2)}`,
+      valueFormatter: (v) => v != null ? `\u20B9${parseFloat(v).toFixed(2)}` : '\u2014',
     },
   ];
 

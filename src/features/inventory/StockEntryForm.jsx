@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -23,20 +23,72 @@ import {
   Paper,
   Autocomplete,
 } from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
+import { Add, Delete, UploadFile } from '@mui/icons-material';
+import parseExcelItems from './parseExcelItems';
 import { format, addMonths } from 'date-fns';
 
 const emptyItem = () => ({
   key: Date.now(),
   medicine_id: '',
   medicine_name: '',
+  hsn_code: '',
+  packing: '',
   batch_no: '',
   expiry_date: format(addMonths(new Date(), 12), 'yyyy-MM-dd'),
   quantity: '',
-  purchase_price: '',
-  selling_price: '',
+  old_mrp: '',
   mrp: '',
+  purchase_price: '',
+  discount: 0,
+  schedule_percent: 0,
+  gst_percent: 0,
 });
+
+// Sticky column total widths (content + padding on both sides)
+// Each cell has 8px horizontal padding (left + right), so total = content + 16px
+const CELL_PAD = 16;
+const STICKY_COLS = [
+  { key: 'qty', width: 55 + CELL_PAD },
+  { key: 'packing', width: 60 + CELL_PAD },
+  { key: 'medicine', width: 180 + CELL_PAD },
+  { key: 'hsn', width: 60 + CELL_PAD },
+  { key: 'batchNo', width: 110 + CELL_PAD },
+];
+
+const STICKY_MAP = {};
+let cumulativeLeft = 0;
+for (const col of STICKY_COLS) {
+  STICKY_MAP[col.key] = { width: col.width, left: cumulativeLeft };
+  cumulativeLeft += col.width;
+}
+
+const makeStickyLeft = (key) => ({
+  position: 'sticky',
+  left: STICKY_MAP[key].left,
+  zIndex: 2,
+  backgroundColor: 'white',
+  width: STICKY_MAP[key].width,
+  minWidth: STICKY_MAP[key].width,
+  maxWidth: STICKY_MAP[key].width,
+  boxSizing: 'border-box',
+});
+
+const stickyRightSx = {
+  position: 'sticky',
+  right: 0,
+  zIndex: 2,
+  backgroundColor: 'white',
+};
+
+const RequiredMark = () => <span style={{ color: '#d32f2f' }}>*</span>;
+
+function calculateLineAmount(item) {
+  const qty = parseFloat(item.quantity) || 0;
+  const rate = parseFloat(item.purchase_price) || 0;
+  const discount = parseFloat(item.discount) || 0;
+  const gst = parseFloat(item.gst_percent) || 0;
+  return qty * rate * (1 - discount / 100) * (1 + gst / 100);
+}
 
 export default function StockEntryForm({ open, onClose, onSave, suppliers, medicines, loading }) {
   const [form, setForm] = useState({
@@ -47,6 +99,8 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
   });
   const [items, setItems] = useState([emptyItem()]);
   const [error, setError] = useState('');
+  const [importWarnings, setImportWarnings] = useState([]);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (open) {
@@ -58,6 +112,7 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
       });
       setItems([emptyItem()]);
       setError('');
+      setImportWarnings([]);
     }
   }, [open]);
 
@@ -75,16 +130,49 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
   };
 
   const handleMedicineSelect = (index, medicine) => {
-    if (medicine) {
-      handleItemChange(index, 'medicine_id', medicine.id);
-      handleItemChange(index, 'medicine_name', medicine.name);
-    } else {
-      handleItemChange(index, 'medicine_id', '');
-      handleItemChange(index, 'medicine_name', '');
-    }
+    setItems((prev) => {
+      const updated = [...prev];
+      if (medicine) {
+        updated[index] = {
+          ...updated[index],
+          medicine_id: medicine.id,
+          medicine_name: medicine.name,
+          hsn_code: medicine.hsn_code || '',
+          packing: medicine.packing || '',
+        };
+      } else {
+        updated[index] = {
+          ...updated[index],
+          medicine_id: '',
+          medicine_name: '',
+          hsn_code: '',
+          packing: '',
+        };
+      }
+      return updated;
+    });
   };
 
   const addItem = () => setItems((prev) => [...prev, emptyItem()]);
+
+  const handleExcelImport = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { items: parsed, warnings } = await parseExcelItems(file, medicines);
+      if (parsed.length === 0) {
+        setError('No valid rows found in the Excel file');
+        return;
+      }
+      setItems(parsed);
+      setImportWarnings(warnings);
+      setError('');
+    } catch (err) {
+      setError(err.message);
+    }
+    // Reset file input so the same file can be re-imported
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const removeItem = (index) => {
     if (items.length === 1) return;
@@ -92,11 +180,7 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
   };
 
   const calculateTotal = () => {
-    return items.reduce((sum, item) => {
-      const qty = parseFloat(item.quantity) || 0;
-      const price = parseFloat(item.purchase_price) || 0;
-      return sum + qty * price;
-    }, 0);
+    return items.reduce((sum, item) => sum + calculateLineAmount(item), 0);
   };
 
   const handleSubmit = async (e) => {
@@ -115,8 +199,8 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
     }
 
     for (const item of validItems) {
-      if (!item.purchase_price || !item.selling_price) {
-        setError('All items must have purchase price and selling price');
+      if (!item.purchase_price) {
+        setError('All items must have purchase price (rate)');
         return;
       }
     }
@@ -132,8 +216,13 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
       expiry_date: item.expiry_date,
       quantity: parseInt(item.quantity, 10),
       purchase_price: parseFloat(item.purchase_price),
-      selling_price: parseFloat(item.selling_price),
+      selling_price: null,
       mrp: item.mrp ? parseFloat(item.mrp) : null,
+      packing: item.packing || null,
+      discount: parseFloat(item.discount) || 0,
+      schedule_percent: parseFloat(item.schedule_percent) || 0,
+      gst_percent: parseFloat(item.gst_percent) || 0,
+      old_mrp: item.old_mrp ? parseFloat(item.old_mrp) : null,
     }));
 
     try {
@@ -141,6 +230,45 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const headCellSx = {
+    fontWeight: 600,
+    whiteSpace: 'nowrap',
+    fontSize: '0.7rem',
+    padding: '6px 8px',
+    textAlign: 'center',
+  };
+
+  const bodyCellSx = {
+    padding: '4px 8px',
+    fontSize: '0.75rem',
+    whiteSpace: 'nowrap',
+  };
+
+  const inputSx = {
+    '& .MuiInputBase-input': { fontSize: '0.75rem', padding: '6px 8px', whiteSpace: 'nowrap' },
+    '& .MuiInputBase-root': { fontSize: '0.75rem' },
+    minWidth: 60,
+  };
+
+  const narrowInputSx = {
+    ...inputSx,
+    minWidth: 50,
+    maxWidth: 55,
+    '& .MuiInputBase-input': { ...inputSx['& .MuiInputBase-input'], textAlign: 'center' },
+  };
+
+  const narrowLeftInputSx = {
+    ...narrowInputSx,
+    '& .MuiInputBase-input': { ...narrowInputSx['& .MuiInputBase-input'], textAlign: 'left' },
+  };
+
+  const priceInputSx = {
+    ...inputSx,
+    minWidth: 50,
+    maxWidth: 70,
+    '& .MuiInputBase-input': { ...inputSx['& .MuiInputBase-input'], textAlign: 'right' },
   };
 
   return (
@@ -161,6 +289,7 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
                 fullWidth
                 required
                 select
+                size="small"
                 label="Supplier"
                 name="supplier_id"
                 value={form.supplier_id}
@@ -176,6 +305,7 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 fullWidth
+                size="small"
                 label="Invoice No."
                 name="invoice_no"
                 value={form.invoice_no}
@@ -185,6 +315,7 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 fullWidth
+                size="small"
                 type="date"
                 label="Invoice Date"
                 name="invoice_date"
@@ -204,60 +335,81 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
             <Typography variant="subtitle1" fontWeight={600}>
               Items
             </Typography>
-            <Button size="small" startIcon={<Add />} onClick={addItem}>
-              Add Row
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <input
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                ref={fileInputRef}
+                onChange={handleExcelImport}
+                style={{ display: 'none' }}
+              />
+              <Button
+                size="small"
+                startIcon={<UploadFile />}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Import Excel
+              </Button>
+              <Button size="small" startIcon={<Add />} onClick={addItem}>
+                Add Row
+              </Button>
+            </Box>
           </Box>
 
-          <TableContainer component={Paper} variant="outlined">
-            <Table size="small">
+          {importWarnings.length > 0 && (
+            <Alert severity="warning" sx={{ mb: 1 }} onClose={() => setImportWarnings([])}>
+              <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>
+                {importWarnings.length} medicine(s) not matched:
+              </Typography>
+              {importWarnings.map((w, i) => (
+                <Typography key={i} variant="caption" display="block">
+                  {w}
+                </Typography>
+              ))}
+            </Alert>
+          )}
+
+          <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto', pb: 1.5 }}>
+            <Table size="small" sx={{ width: 'max-content', minWidth: '100%' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ minWidth: 200 }}>Medicine *</TableCell>
-                  <TableCell sx={{ minWidth: 120 }}>Batch No. *</TableCell>
-                  <TableCell sx={{ minWidth: 140 }}>Expiry Date</TableCell>
-                  <TableCell sx={{ minWidth: 80 }}>Qty *</TableCell>
-                  <TableCell sx={{ minWidth: 110 }}>Purchase Price *</TableCell>
-                  <TableCell sx={{ minWidth: 110 }}>Selling Price *</TableCell>
-                  <TableCell sx={{ minWidth: 100 }}>MRP</TableCell>
-                  <TableCell sx={{ minWidth: 100 }}>Line Total</TableCell>
-                  <TableCell width={50}></TableCell>
+                  <TableCell sx={{ ...headCellSx, ...makeStickyLeft('qty'), zIndex: 3 }}>
+                    Qty <RequiredMark />
+                  </TableCell>
+                  <TableCell sx={{ ...headCellSx, ...makeStickyLeft('packing'), zIndex: 3 }}>
+                    Packing
+                  </TableCell>
+                  <TableCell sx={{ ...headCellSx, ...makeStickyLeft('medicine'), zIndex: 3 }}>
+                    Medicine <RequiredMark />
+                  </TableCell>
+                  <TableCell sx={{ ...headCellSx, ...makeStickyLeft('hsn'), zIndex: 3 }}>
+                    HSN
+                  </TableCell>
+                  <TableCell sx={{ ...headCellSx, ...makeStickyLeft('batchNo'), zIndex: 3 }}>
+                    Batch No. <RequiredMark />
+                  </TableCell>
+                  <TableCell sx={headCellSx}>
+                    Expiry <RequiredMark />
+                  </TableCell>
+                  <TableCell sx={headCellSx}>Old MRP</TableCell>
+                  <TableCell sx={headCellSx}>MRP</TableCell>
+                  <TableCell sx={headCellSx}>
+                    Rate <RequiredMark />
+                  </TableCell>
+                  <TableCell sx={headCellSx}>Disc%</TableCell>
+                  <TableCell sx={headCellSx}>Sch%</TableCell>
+                  <TableCell sx={headCellSx}>GST%</TableCell>
+                  <TableCell sx={headCellSx}>Amount</TableCell>
+                  <TableCell
+                    sx={{ ...headCellSx, ...stickyRightSx, zIndex: 3 }}
+                  ></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {items.map((item, index) => (
                   <TableRow key={item.key}>
-                    <TableCell>
-                      <Autocomplete
-                        size="small"
-                        options={medicines}
-                        getOptionLabel={(opt) => opt.name || ''}
-                        value={medicines.find((m) => m.id === item.medicine_id) || null}
-                        onChange={(_, val) => handleMedicineSelect(index, val)}
-                        renderInput={(params) => (
-                          <TextField {...params} placeholder="Search medicine" />
-                        )}
-                        isOptionEqualToValue={(opt, val) => opt.id === val.id}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <TextField
-                        size="small"
-                        fullWidth
-                        value={item.batch_no}
-                        onChange={(e) => handleItemChange(index, 'batch_no', e.target.value)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <TextField
-                        size="small"
-                        fullWidth
-                        type="date"
-                        value={item.expiry_date}
-                        onChange={(e) => handleItemChange(index, 'expiry_date', e.target.value)}
-                      />
-                    </TableCell>
-                    <TableCell>
+                    {/* Qty - sticky */}
+                    <TableCell sx={{ ...bodyCellSx, ...makeStickyLeft('qty') }}>
                       <TextField
                         size="small"
                         fullWidth
@@ -265,29 +417,90 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
                         value={item.quantity}
                         onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                         slotProps={{ htmlInput: { min: 1 } }}
+                        sx={narrowInputSx}
                       />
                     </TableCell>
-                    <TableCell>
+                    {/* Packing - sticky */}
+                    <TableCell sx={{ ...bodyCellSx, ...makeStickyLeft('packing') }}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        value={item.packing}
+                        onChange={(e) => handleItemChange(index, 'packing', e.target.value)}
+                        placeholder="e.g. 10s"
+                        sx={narrowLeftInputSx}
+                      />
+                    </TableCell>
+                    {/* Medicine - sticky */}
+                    <TableCell sx={{ ...bodyCellSx, ...makeStickyLeft('medicine') }}>
+                      <Autocomplete
+                        size="small"
+                        options={medicines}
+                        getOptionLabel={(opt) => {
+                          if (!opt.name) return '';
+                          if (!opt.packing) return opt.name;
+                          return `${opt.name} (${opt.packing}${opt.unit ? ' ' + opt.unit : ''})`;
+                        }}
+                        value={medicines.find((m) => m.id === item.medicine_id) || null}
+                        onChange={(_, val) => handleMedicineSelect(index, val)}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder="Search medicine"
+                            sx={inputSx}
+                          />
+                        )}
+                        isOptionEqualToValue={(opt, val) => opt.id === val.id}
+                      />
+                    </TableCell>
+                    {/* HSN - sticky, read-only */}
+                    <TableCell sx={{ ...bodyCellSx, ...makeStickyLeft('hsn') }}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        value={item.hsn_code}
+                        slotProps={{ input: { readOnly: true } }}
+                        sx={{
+                          ...narrowInputSx,
+                          '& .MuiInputBase-root': { backgroundColor: '#f5f5f5' },
+                        }}
+                      />
+                    </TableCell>
+                    {/* Batch No - sticky */}
+                    <TableCell sx={{ ...bodyCellSx, ...makeStickyLeft('batchNo') }}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        value={item.batch_no}
+                        onChange={(e) => handleItemChange(index, 'batch_no', e.target.value)}
+                        sx={inputSx}
+                      />
+                    </TableCell>
+                    {/* Expiry Date */}
+                    <TableCell sx={bodyCellSx}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        type="date"
+                        value={item.expiry_date}
+                        onChange={(e) => handleItemChange(index, 'expiry_date', e.target.value)}
+                        sx={inputSx}
+                      />
+                    </TableCell>
+                    {/* Old MRP */}
+                    <TableCell sx={bodyCellSx}>
                       <TextField
                         size="small"
                         fullWidth
                         type="number"
-                        value={item.purchase_price}
-                        onChange={(e) => handleItemChange(index, 'purchase_price', e.target.value)}
+                        value={item.old_mrp}
+                        onChange={(e) => handleItemChange(index, 'old_mrp', e.target.value)}
                         slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+                        sx={priceInputSx}
                       />
                     </TableCell>
-                    <TableCell>
-                      <TextField
-                        size="small"
-                        fullWidth
-                        type="number"
-                        value={item.selling_price}
-                        onChange={(e) => handleItemChange(index, 'selling_price', e.target.value)}
-                        slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
-                      />
-                    </TableCell>
-                    <TableCell>
+                    {/* MRP */}
+                    <TableCell sx={bodyCellSx}>
                       <TextField
                         size="small"
                         fullWidth
@@ -295,16 +508,67 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
                         value={item.mrp}
                         onChange={(e) => handleItemChange(index, 'mrp', e.target.value)}
                         slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+                        sx={priceInputSx}
                       />
                     </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={600}>
-                        {(
-                          (parseFloat(item.quantity) || 0) * (parseFloat(item.purchase_price) || 0)
-                        ).toFixed(2)}
+                    {/* Rate (purchase_price) */}
+                    <TableCell sx={bodyCellSx}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        type="number"
+                        value={item.purchase_price}
+                        onChange={(e) => handleItemChange(index, 'purchase_price', e.target.value)}
+                        slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+                        sx={priceInputSx}
+                      />
+                    </TableCell>
+                    {/* Discount % */}
+                    <TableCell sx={bodyCellSx}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        type="number"
+                        value={item.discount}
+                        onChange={(e) => handleItemChange(index, 'discount', e.target.value)}
+                        slotProps={{ htmlInput: { min: 0, max: 100, step: 0.01 } }}
+                        sx={narrowInputSx}
+                      />
+                    </TableCell>
+                    {/* Schedule % */}
+                    <TableCell sx={bodyCellSx}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        type="number"
+                        value={item.schedule_percent}
+                        onChange={(e) =>
+                          handleItemChange(index, 'schedule_percent', e.target.value)
+                        }
+                        slotProps={{ htmlInput: { min: 0, max: 100, step: 0.01 } }}
+                        sx={narrowInputSx}
+                      />
+                    </TableCell>
+                    {/* GST % */}
+                    <TableCell sx={bodyCellSx}>
+                      <TextField
+                        size="small"
+                        fullWidth
+                        type="number"
+                        value={item.gst_percent}
+                        onChange={(e) => handleItemChange(index, 'gst_percent', e.target.value)}
+                        slotProps={{ htmlInput: { min: 0, max: 100, step: 0.01 } }}
+                        sx={narrowInputSx}
+                      />
+                    </TableCell>
+                    {/* Amount */}
+                    <TableCell sx={{ ...bodyCellSx, textAlign: 'right' }}>
+                      <Typography variant="body2" fontWeight={600} fontSize="0.75rem" noWrap>
+                        {calculateLineAmount(item).toFixed(2)}
                       </Typography>
                     </TableCell>
-                    <TableCell>
+                    {/* Delete - sticky right */}
+                    <TableCell sx={{ ...bodyCellSx, ...stickyRightSx }}>
                       <IconButton
                         size="small"
                         color="error"

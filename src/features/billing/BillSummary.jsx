@@ -58,7 +58,7 @@ export default function BillSummary({ bill, onUpdate, subtotal }) {
             fullWidth
             size="small"
             type="number"
-            label="Discount (\u20B9)"
+            label="Discount (₹)"
             value={bill.discount}
             onChange={(e) => onUpdate({ discount: e.target.value })}
             slotProps={{ htmlInput: { min: 0, step: 0.01 } }}

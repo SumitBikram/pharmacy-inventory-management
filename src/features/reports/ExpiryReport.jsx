@@ -3,6 +3,7 @@ import { Box, Chip, Typography } from '@mui/material';
 import { format, differenceInDays } from 'date-fns';
 import DataTable from '../../components/shared/DataTable';
 import { getExpiryReport } from './reportService';
+import { formatMedicineName } from '../../lib/stockUtils';
 
 export default function ExpiryReport() {
   const [data, setData] = useState([]);
@@ -28,7 +29,7 @@ export default function ExpiryReport() {
       headerName: 'Medicine',
       flex: 1.3,
       minWidth: 160,
-      valueGetter: (value) => value?.name || '—',
+      valueGetter: (value) => formatMedicineName(value?.name, value?.packing, value?.unit),
     },
     {
       field: 'manufacturer',
@@ -84,14 +85,14 @@ export default function ExpiryReport() {
       field: 'selling_price',
       headerName: 'Selling Price',
       width: 110,
-      valueFormatter: (v) => `\u20B9${parseFloat(v).toFixed(2)}`,
+      valueFormatter: (v) => v != null ? `\u20B9${parseFloat(v).toFixed(2)}` : '\u2014',
     },
     {
       field: 'stock_value',
       headerName: 'Stock Value',
       width: 120,
-      valueGetter: (_, row) => row.quantity * parseFloat(row.selling_price),
-      valueFormatter: (v) => `\u20B9${v.toFixed(2)}`,
+      valueGetter: (_, row) => row.selling_price != null ? row.quantity * parseFloat(row.selling_price) : null,
+      valueFormatter: (v) => v != null ? `\u20B9${v.toFixed(2)}` : '\u2014',
     },
   ];
 

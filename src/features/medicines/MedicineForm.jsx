@@ -22,6 +22,7 @@ export default function MedicineForm({ open, onClose, onSave, medicine, categori
     manufacturer: '',
     composition: '',
     hsn_code: '',
+    packing: '',
     unit: 'pcs',
     prescription_required: false,
   });
@@ -36,6 +37,7 @@ export default function MedicineForm({ open, onClose, onSave, medicine, categori
         manufacturer: medicine.manufacturer || '',
         composition: medicine.composition || '',
         hsn_code: medicine.hsn_code || '',
+        packing: medicine.packing || '',
         unit: medicine.unit || 'pcs',
         prescription_required: medicine.prescription_required || false,
       });
@@ -47,6 +49,7 @@ export default function MedicineForm({ open, onClose, onSave, medicine, categori
         manufacturer: '',
         composition: '',
         hsn_code: '',
+        packing: '',
         unit: 'pcs',
         prescription_required: false,
       });
@@ -146,6 +149,16 @@ export default function MedicineForm({ open, onClose, onSave, medicine, categori
                 name="hsn_code"
                 value={form.hsn_code}
                 onChange={handleChange}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                fullWidth
+                label="Packing"
+                name="packing"
+                value={form.packing}
+                onChange={handleChange}
+                placeholder="e.g. 10s, 15gm, 100ml"
               />
             </Grid>
             <Grid size={{ xs: 12 }}>

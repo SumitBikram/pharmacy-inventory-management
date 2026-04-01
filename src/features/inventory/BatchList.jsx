@@ -1,22 +1,17 @@
-import { format, differenceInDays } from 'date-fns';
-import { Chip } from '@mui/material';
+import { format } from 'date-fns';
+import { Chip, IconButton, Tooltip } from '@mui/material';
+import { Edit } from '@mui/icons-material';
 import DataTable from '../../components/shared/DataTable';
+import { getExpiryStatus, formatMedicineName } from '../../lib/stockUtils';
 
-function getExpiryStatus(expiryDate) {
-  const days = differenceInDays(new Date(expiryDate), new Date());
-  if (days < 0) return { label: 'Expired', color: 'error' };
-  if (days <= 90) return { label: 'Expiring Soon', color: 'warning' };
-  return { label: 'OK', color: 'success' };
-}
-
-export default function BatchList({ batches, loading }) {
+export default function BatchList({ batches, loading, onEditPricing }) {
   const columns = [
     {
       field: 'medicine',
       headerName: 'Medicine',
       flex: 1.3,
       minWidth: 160,
-      valueGetter: (value) => value?.name || '—',
+      valueGetter: (value) => formatMedicineName(value?.name, value?.packing, value?.unit),
     },
     {
       field: 'batch_no',
@@ -62,7 +57,7 @@ export default function BatchList({ batches, loading }) {
       field: 'selling_price',
       headerName: 'Selling Price',
       width: 120,
-      valueFormatter: (value) => `\u20B9${parseFloat(value).toFixed(2)}`,
+      valueFormatter: (value) => value != null ? `\u20B9${parseFloat(value).toFixed(2)}` : '\u2014',
     },
     {
       field: 'mrp',
@@ -77,6 +72,31 @@ export default function BatchList({ batches, loading }) {
       minWidth: 120,
       valueGetter: (value) => value?.name || '—',
     },
+    ...(onEditPricing
+      ? [
+          {
+            field: 'actions',
+            headerName: '',
+            width: 50,
+            sortable: false,
+            filterable: false,
+            disableColumnMenu: true,
+            renderCell: ({ row }) => (
+              <Tooltip title="Edit Prices">
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditPricing(row);
+                  }}
+                >
+                  <Edit fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return <DataTable rows={batches} columns={columns} loading={loading} pageSize={25} />;

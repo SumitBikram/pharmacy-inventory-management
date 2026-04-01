@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase';
 export async function getStockBatches({ search = '', medicineId = '', showEmpty = false } = {}) {
   let query = supabase
     .from('stock_batches')
-    .select('*, medicine:medicines(id, name, generic_name), supplier:suppliers(id, name)')
+    .select('*, medicine:medicines(id, name, generic_name, packing, unit), supplier:suppliers(id, name)')
     .order('expiry_date', { ascending: true });
 
   if (!showEmpty) {
@@ -36,6 +36,20 @@ export async function updateBatchQuantity(batchId, newQuantity) {
   const { data, error } = await supabase
     .from('stock_batches')
     .update({ quantity: newQuantity })
+    .eq('id', batchId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateBatchPricing(batchId, { selling_price, mrp }) {
+  const { data, error } = await supabase
+    .from('stock_batches')
+    .update({
+      selling_price: selling_price != null ? selling_price : null,
+      mrp: mrp != null ? mrp : null,
+    })
     .eq('id', batchId)
     .select()
     .single();
@@ -92,6 +106,11 @@ export async function createPurchaseEntry(entry, items) {
     purchase_price: item.purchase_price,
     selling_price: item.selling_price,
     mrp: item.mrp || null,
+    packing: item.packing || null,
+    discount: item.discount || 0,
+    schedule_percent: item.schedule_percent || 0,
+    gst_percent: item.gst_percent || 0,
+    old_mrp: item.old_mrp || null,
   }));
 
   const { error: itemsError } = await supabase.from('purchase_items').insert(purchaseItems);
@@ -123,6 +142,8 @@ export async function createPurchaseEntry(entry, items) {
           purchase_price: item.purchase_price,
           selling_price: item.selling_price,
           mrp: item.mrp || null,
+          packing: item.packing || null,
+          gst_percent: item.gst_percent || 0,
           supplier_id: entry.supplier_id,
           purchase_entry_id: purchaseEntry.id,
         })
@@ -144,6 +165,8 @@ export async function createPurchaseEntry(entry, items) {
         purchase_price: item.purchase_price,
         selling_price: item.selling_price,
         mrp: item.mrp || null,
+        packing: item.packing || null,
+        gst_percent: item.gst_percent || 0,
         supplier_id: entry.supplier_id,
         purchase_entry_id: purchaseEntry.id,
       });

@@ -5,8 +5,34 @@ export async function searchMedicinesForBilling(search) {
 
   const { data, error } = await supabase
     .from('medicines')
-    .select('id, name, generic_name')
+    .select('id, name, generic_name, packing, unit')
     .eq('is_active', true)
+    .or(`name.ilike.%${search}%,generic_name.ilike.%${search}%`)
+    .limit(10);
+  if (error) throw error;
+  return data;
+}
+
+export async function searchMedicinesWithStock(search) {
+  if (!search || search.length < 2) return [];
+  const today = new Date().toISOString().split('T')[0];
+
+  // Get medicine IDs that have available (non-expired) stock
+  const { data: stockData, error: stockError } = await supabase
+    .from('stock_batches')
+    .select('medicine_id')
+    .gt('quantity', 0)
+    .gt('expiry_date', today);
+  if (stockError) throw stockError;
+
+  const inStockIds = [...new Set(stockData.map((r) => r.medicine_id))];
+  if (inStockIds.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from('medicines')
+    .select('id, name, generic_name, packing, unit')
+    .eq('is_active', true)
+    .in('id', inStockIds)
     .or(`name.ilike.%${search}%,generic_name.ilike.%${search}%`)
     .limit(10);
   if (error) throw error;
@@ -100,7 +126,7 @@ export async function getBillDetails(billId) {
       created_by_user:users(full_name),
       items:bill_items(
         *,
-        medicine:medicines(id, name, generic_name),
+        medicine:medicines(id, name, generic_name, packing, unit),
         batch:stock_batches(batch_no, expiry_date)
       )
     `,
