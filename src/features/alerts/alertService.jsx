@@ -21,7 +21,7 @@ export async function getExpiringSoonBatches() {
 export async function getExpiredBatches() {
   const { data, error } = await supabase
     .from('stock_batches')
-    .select('*, medicine:medicines(id, name, generic_name)')
+    .select('*, medicine:medicines(id, name, generic_name, packing, unit)')
     .gt('quantity', 0)
     .lte('expiry_date', new Date().toISOString().split('T')[0])
     .order('expiry_date', { ascending: true });
@@ -45,7 +45,6 @@ export async function getAlertSettings() {
 export async function updateAlertSetting(key, value) {
   const { error } = await supabase
     .from('settings')
-    .update({ value: JSON.stringify(value), updated_at: new Date().toISOString() })
-    .eq('key', key);
+    .upsert({ key, value, updated_at: new Date().toISOString() });
   if (error) throw error;
 }

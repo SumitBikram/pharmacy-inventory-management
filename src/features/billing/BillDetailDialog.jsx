@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import { format } from 'date-fns';
 import { getBillDetails } from './billingService';
+import { formatMedicineName } from '../../lib/stockUtils';
 
 export default function BillDetailDialog({ open, billId, onClose }) {
   const [bill, setBill] = useState(null);
@@ -99,7 +100,7 @@ export default function BillDetailDialog({ open, billId, onClose }) {
               {bill.items?.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
-                    {item.medicine?.name}
+                    {formatMedicineName(item.medicine?.name, item.medicine?.packing, item.medicine?.unit)}
                     {item.medicine?.generic_name && (
                       <Typography variant="caption" display="block" color="text.secondary">
                         {item.medicine.generic_name}

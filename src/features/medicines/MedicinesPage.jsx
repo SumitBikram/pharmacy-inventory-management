@@ -25,6 +25,7 @@ import {
   deleteMedicine,
 } from './medicineService';
 import useRoleAccess from '../../hooks/useRoleAccess';
+import { formatMedicineName } from '../../lib/stockUtils';
 
 export default function MedicinesPage() {
   const { canManageMedicines } = useRoleAccess();
@@ -79,6 +80,8 @@ export default function MedicinesPage() {
       setFormOpen(false);
       setEditingMedicine(null);
       fetchData();
+    } catch (err) {
+      throw err;
     } finally {
       setSaving(false);
     }
@@ -120,10 +123,10 @@ export default function MedicinesPage() {
       headerName: 'Medicine Name',
       flex: 1.5,
       minWidth: 180,
-      renderCell: ({ value }) => (
+      renderCell: ({ row }) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
           <Typography variant="body2" fontWeight={600}>
-            {value}
+            {formatMedicineName(row.name, row.packing, row.unit)}
           </Typography>
         </Box>
       ),

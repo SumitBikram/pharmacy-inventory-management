@@ -15,6 +15,7 @@ import AlertsPage from './features/alerts/AlertsPage';
 import ReportsPage from './features/reports/ReportsPage';
 import UsersPage from './features/users/UsersPage';
 import ProfilePage from './features/auth/ProfilePage';
+import MedicineLookupPage from './features/lookup/MedicineLookupPage';
 import NotFoundPage from './components/shared/NotFoundPage';
 import useAuthStore from './features/auth/authStore';
 import { ROLES } from './lib/constants';
@@ -23,7 +24,13 @@ function App() {
   const initialize = useAuthStore((s) => s.initialize);
 
   useEffect(() => {
-    initialize();
+    let subscription;
+    initialize().then((sub) => {
+      subscription = sub;
+    });
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, [initialize]);
 
   return (
@@ -42,6 +49,7 @@ function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/medicines" element={<MedicinesPage />} />
                 <Route path="/inventory" element={<InventoryPage />} />
+                <Route path="/medicine-lookup" element={<MedicineLookupPage />} />
                 <Route path="/alerts" element={<AlertsPage />} />
 
                 {/* Admin + Salesman */}

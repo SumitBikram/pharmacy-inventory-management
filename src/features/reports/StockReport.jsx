@@ -23,7 +23,16 @@ export default function StockReport() {
   }, []);
 
   const columns = [
-    { field: 'medicine_name', headerName: 'Medicine', flex: 1.3, minWidth: 160 },
+    {
+      field: 'medicine_name',
+      headerName: 'Medicine',
+      flex: 1.3,
+      minWidth: 160,
+      valueGetter: (_, row) => {
+        if (!row.packing) return row.medicine_name;
+        return `${row.medicine_name} (${row.packing}${row.unit ? ' ' + row.unit : ''})`;
+      },
+    },
     {
       field: 'generic_name',
       headerName: 'Generic Name',

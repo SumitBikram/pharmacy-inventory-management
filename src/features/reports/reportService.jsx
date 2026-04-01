@@ -99,7 +99,7 @@ export async function getStockReport() {
 export async function getExpiryReport() {
   const { data, error } = await supabase
     .from('stock_batches')
-    .select('*, medicine:medicines(id, name, generic_name, manufacturer)')
+    .select('*, medicine:medicines(id, name, generic_name, packing, unit, manufacturer)')
     .gt('quantity', 0)
     .order('expiry_date', { ascending: true });
   if (error) throw error;

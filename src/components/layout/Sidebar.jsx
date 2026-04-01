@@ -23,12 +23,14 @@ import {
   PeopleAlt as UsersIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
+  Search as SearchIcon,
 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { DRAWER_WIDTH, DRAWER_WIDTH_COLLAPSED, ROLES } from '../../lib/constants';
 import useAuthStore from '../../features/auth/authStore';
 
 const menuItems = [
+  { text: 'Medicine Lookup', icon: <SearchIcon />, path: '/medicine-lookup' },
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Medicines', icon: <MedicineIcon />, path: '/medicines' },
   {

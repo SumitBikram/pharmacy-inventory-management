@@ -7,6 +7,7 @@ export const medicineSchema = z.object({
   manufacturer: z.string().max(200).optional().or(z.literal('')),
   composition: z.string().max(500).optional().or(z.literal('')),
   hsn_code: z.string().max(20).optional().or(z.literal('')),
+  packing: z.string().max(20).optional().or(z.literal('')),
   unit: z.enum(['pcs', 'strip', 'bottle', 'box', 'tube', 'ml']),
   prescription_required: z.boolean(),
 });
@@ -26,8 +27,13 @@ export const purchaseItemSchema = z.object({
   expiry_date: z.string().min(1, 'Expiry date is required'),
   quantity: z.number().int().positive('Quantity must be positive'),
   purchase_price: z.number().positive('Purchase price is required'),
-  selling_price: z.number().positive('Selling price is required'),
+  selling_price: z.number().positive('Selling price must be positive').nullable().optional(),
   mrp: z.number().positive().optional().nullable(),
+  packing: z.string().max(20).optional().or(z.literal('')),
+  discount: z.number().min(0).max(100).optional().default(0),
+  schedule_percent: z.number().min(0).max(100).optional().default(0),
+  gst_percent: z.number().min(0).max(100).optional().default(0),
+  old_mrp: z.number().positive().optional().nullable(),
 });
 
 export const billItemSchema = z.object({
