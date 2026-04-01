@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Chip } from '@mui/material';
 import { keyframes } from '@emotion/react';
 import {
   ManageSearch,
@@ -12,7 +12,7 @@ import {
   TipsAndUpdatesOutlined,
 } from '@mui/icons-material';
 
-const TIPS = [
+const getTips = (expiryDays) => [
   {
     icon: ManageSearch,
     message: 'Search for a medicine',
@@ -30,8 +30,12 @@ const TIPS = [
   },
   {
     icon: InventoryOutlined,
-    message: 'Tip: Follow FIFO',
-    hint: 'The green "Sell First" badge highlights the earliest-expiry batch — dispense that one first',
+    message: 'Tip: Follow First Expiry First Out',
+    hint: (
+      <>
+        The green <Chip label="Sell First" size="small" color="success" sx={{ fontSize: '0.7rem' }} /> badge highlights the earliest-expiry batch — dispense that one first
+      </>
+    ),
   },
   {
     icon: LocalPharmacyOutlined,
@@ -41,7 +45,7 @@ const TIPS = [
   {
     icon: EventNoteOutlined,
     message: 'Watch for expiry alerts',
-    hint: 'Batches expiring within 90 days are flagged — plan returns early',
+    hint: `Batches expiring within ${expiryDays} days are flagged — plan returns early`,
   },
   {
     icon: ScienceOutlined,
@@ -77,16 +81,17 @@ const reducedMotion = {
 const INTERVAL = 5000;
 const SLIDE_DURATION = 700;
 
-export default function LookupEmptyState() {
-  const [tipIndex, setTipIndex] = useState(() => Math.floor(Math.random() * TIPS.length));
+export default function LookupEmptyState({ expiryWarningDays = 90 }) {
+  const tips = getTips(expiryWarningDays);
+  const [tipIndex, setTipIndex] = useState(() => Math.floor(Math.random() * tips.length));
   const [phase, setPhase] = useState('in'); // 'in' | 'out'
 
   const pickNextIndex = useCallback(() => {
     setTipIndex((prev) => {
       let next;
       do {
-        next = Math.floor(Math.random() * TIPS.length);
-      } while (next === prev && TIPS.length > 1);
+        next = Math.floor(Math.random() * tips.length);
+      } while (next === prev && tips.length > 1);
       return next;
     });
   }, []);
@@ -105,7 +110,7 @@ export default function LookupEmptyState() {
     return () => clearInterval(timer);
   }, [pickNextIndex]);
 
-  const { icon: IconComponent, message, hint } = TIPS[tipIndex];
+  const { icon: IconComponent, message, hint } = tips[tipIndex];
 
   const slideAnimation =
     phase === 'in'

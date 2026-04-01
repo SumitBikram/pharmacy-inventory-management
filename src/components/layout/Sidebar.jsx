@@ -30,9 +30,9 @@ import { DRAWER_WIDTH, DRAWER_WIDTH_COLLAPSED, ROLES } from '../../lib/constants
 import useAuthStore from '../../features/auth/authStore';
 
 const menuItems = [
+  { text: 'Medicine Lookup', icon: <SearchIcon />, path: '/medicine-lookup' },
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Medicines', icon: <MedicineIcon />, path: '/medicines' },
-  { text: 'Medicine Lookup', icon: <SearchIcon />, path: '/medicine-lookup' },
   {
     text: 'Inventory',
     icon: <InventoryIcon />,

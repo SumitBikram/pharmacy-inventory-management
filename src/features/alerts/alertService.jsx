@@ -45,7 +45,6 @@ export async function getAlertSettings() {
 export async function updateAlertSetting(key, value) {
   const { error } = await supabase
     .from('settings')
-    .update({ value: JSON.stringify(value), updated_at: new Date().toISOString() })
-    .eq('key', key);
+    .upsert({ key, value, updated_at: new Date().toISOString() });
   if (error) throw error;
 }

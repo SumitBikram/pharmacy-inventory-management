@@ -12,12 +12,13 @@ import {
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { format, differenceInDays } from 'date-fns';
-import PageHeader from '../../components/shared/PageHeader';
+
 import DataTable from '../../components/shared/DataTable';
 import { searchMedicinesWithStock, getMedicineBatchDetails } from './lookupService';
 import { getMedicine } from '../medicines/medicineService';
 import { getExpiryStatus, formatMedicineName } from '../../lib/stockUtils';
 import LookupEmptyState from './LookupEmptyState';
+import { getAlertSettings } from '../alerts/alertService';
 
 export default function MedicineLookupPage() {
   const [searchText, setSearchText] = useState('');
@@ -27,11 +28,17 @@ export default function MedicineLookupPage() {
   const [medicineInfo, setMedicineInfo] = useState(null);
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [expiryWarningDays, setExpiryWarningDays] = useState(90);
   const searchInputRef = useRef(null);
 
-  // Auto-focus search input on mount
+  // Auto-focus search input on mount & fetch alert settings
   useEffect(() => {
     searchInputRef.current?.focus();
+    getAlertSettings()
+      .then((s) => {
+        if (s.expiry_warning_days) setExpiryWarningDays(s.expiry_warning_days);
+      })
+      .catch(() => {});
   }, []);
 
   // Search medicines as user types
@@ -178,9 +185,7 @@ export default function MedicineLookupPage() {
 
   return (
     <Box>
-      <PageHeader title="Medicine Lookup" subtitle="Search for any medicine to check stock and batch details" />
-
-      <Box sx={{ width: '100%', maxWidth: 650, mx: 'auto', mb: 3 }}>
+      <Box sx={{ width: '100%', maxWidth: 650, mx: 'auto', mb: 3, mt: 6 }}>
         <Autocomplete
           size="small"
           options={options}
@@ -200,6 +205,7 @@ export default function MedicineLookupPage() {
               {...params}
               inputRef={searchInputRef}
               placeholder="Type medicine name to search..."
+              helperText="Search for any medicine to check stock and batch details"
               slotProps={{
                 input: {
                   ...params.InputProps,
@@ -230,7 +236,7 @@ export default function MedicineLookupPage() {
 
       {!selectedMedicine && !loading && (
         <Box sx={{ mt: 10 }}>
-          <LookupEmptyState />
+          <LookupEmptyState expiryWarningDays={expiryWarningDays} />
         </Box>
       )}
 
