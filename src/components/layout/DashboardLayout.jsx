@@ -13,7 +13,7 @@ export default function DashboardLayout() {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <Topbar onMenuToggle={() => setMobileOpen(!mobileOpen)} />
+      <Topbar onMenuToggle={() => setMobileOpen(!mobileOpen)} collapsed={collapsed} />
       <Sidebar
         mobileOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}

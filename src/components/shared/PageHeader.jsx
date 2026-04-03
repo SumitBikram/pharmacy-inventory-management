@@ -3,7 +3,7 @@ import { Add as AddIcon } from '@mui/icons-material';
 
 export default function PageHeader({ title, subtitle, actionLabel, onAction, actionIcon }) {
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
       <Box>
         <Typography variant="h5">{title}</Typography>
         {subtitle && (

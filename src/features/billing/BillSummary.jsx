@@ -8,8 +8,18 @@ const paymentOptions = [
   { value: PAYMENT_METHODS.CREDIT, label: 'Credit' },
 ];
 
+function resolveDiscount(input, subtotal) {
+  const str = String(input).trim();
+  if (!str) return 0;
+  if (str.endsWith('%')) {
+    const pct = parseFloat(str) || 0;
+    return Math.min(Math.max((pct / 100) * subtotal, 0), subtotal);
+  }
+  return Math.min(Math.max(parseFloat(str) || 0, 0), subtotal);
+}
+
 export default function BillSummary({ bill, onUpdate, subtotal }) {
-  const discount = parseFloat(bill.discount) || 0;
+  const discount = resolveDiscount(bill.discount, subtotal);
   const total = Math.max(subtotal - discount, 0);
 
   return (
@@ -57,11 +67,14 @@ export default function BillSummary({ bill, onUpdate, subtotal }) {
           <TextField
             fullWidth
             size="small"
-            type="number"
-            label="Discount (₹)"
+            label="Discount"
+            placeholder="e.g. 50 or 10%"
             value={bill.discount}
-            onChange={(e) => onUpdate({ discount: e.target.value })}
-            slotProps={{ htmlInput: { min: 0, step: 0.01 } }}
+            onChange={(e) => {
+              const val = e.target.value.replace(/[^0-9.%]/g, '').replace(/(%.*)$/, '%');
+              onUpdate({ discount: val });
+            }}
+            helperText={discount > 0 ? `- \u20B9${discount.toFixed(2)}` : ''}
           />
         </Grid>
         <Grid size={{ xs: 12 }}>

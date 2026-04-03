@@ -25,6 +25,16 @@ import { createBill } from './billingService';
 import useAuthStore from '../auth/authStore';
 import { PAYMENT_METHODS } from '../../lib/constants';
 
+function resolveDiscount(input, subtotal) {
+  const str = String(input).trim();
+  if (!str) return 0;
+  if (str.endsWith('%')) {
+    const pct = parseFloat(str) || 0;
+    return Math.min(Math.max((pct / 100) * subtotal, 0), subtotal);
+  }
+  return Math.min(Math.max(parseFloat(str) || 0, 0), subtotal);
+}
+
 const emptyItem = () => ({
   key: Date.now() + Math.random(),
   medicine_id: '',
@@ -73,7 +83,7 @@ export default function BillingPage() {
     return sum + qty * price;
   }, 0);
 
-  const discount = parseFloat(bill.discount) || 0;
+  const discount = resolveDiscount(bill.discount, subtotal);
   const total = Math.max(subtotal - discount, 0);
 
   const resetBill = () => {
