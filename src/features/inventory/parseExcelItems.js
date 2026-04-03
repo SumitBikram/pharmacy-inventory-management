@@ -1,5 +1,5 @@
 import { read, utils, SSF } from 'xlsx';
-import { format, parse, lastDayOfMonth } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 /**
  * Fixed column indices matching the expected Excel format:
@@ -61,11 +61,11 @@ function parseExpiryDate(value) {
   // yyyy-MM-dd (already correct)
   if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
 
-  // MM/YYYY or MM-YYYY → last day of month
+  // MM/YYYY or MM-YYYY → first day of month
   const mmYYYY = str.match(/^(\d{1,2})[/-](\d{4})$/);
   if (mmYYYY) {
     const date = new Date(parseInt(mmYYYY[2]), parseInt(mmYYYY[1]) - 1, 1);
-    return format(lastDayOfMonth(date), 'yyyy-MM-dd');
+    return format(date, 'yyyy-MM-dd');
   }
 
   // DD/MM/YYYY or DD-MM-YYYY
@@ -75,12 +75,12 @@ function parseExpiryDate(value) {
     return format(date, 'yyyy-MM-dd');
   }
 
-  // MM/YY or MM-YY → last day of month, assume 20xx
+  // MM/YY or MM-YY → first day of month, assume 20xx
   const mmYY = str.match(/^(\d{1,2})[/-](\d{2})$/);
   if (mmYY) {
     const year = 2000 + parseInt(mmYY[2]);
     const date = new Date(year, parseInt(mmYY[1]) - 1, 1);
-    return format(lastDayOfMonth(date), 'yyyy-MM-dd');
+    return format(date, 'yyyy-MM-dd');
   }
 
   // Try native Date parse as fallback

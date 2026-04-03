@@ -1,5 +1,25 @@
 import { supabase } from '../../lib/supabase';
-import { format, startOfMonth, endOfMonth, subMonths, startOfDay, endOfDay } from 'date-fns';
+import {
+  getLowStockMedicines,
+  getExpiringSoonBatches,
+  getExpiredBatches,
+} from '../alerts/alertService';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  subMonths,
+  startOfDay,
+  endOfDay,
+  startOfWeek,
+  endOfWeek,
+  startOfYear,
+  endOfYear,
+  eachDayOfInterval,
+  eachWeekOfInterval,
+  eachMonthOfInterval,
+  eachYearOfInterval,
+} from 'date-fns';
 
 export async function getDashboardStats() {
   const today = format(new Date(), 'yyyy-MM-dd');
@@ -87,6 +107,59 @@ export async function getMonthlySalesData(monthsBack = 6) {
   return results;
 }
 
+const bucketConfigs = {
+  day: {
+    interval: eachDayOfInterval,
+    start: startOfDay,
+    end: endOfDay,
+    labelFormat: 'dd MMM',
+  },
+  week: {
+    interval: eachWeekOfInterval,
+    start: startOfWeek,
+    end: endOfWeek,
+    labelFormat: 'dd MMM',
+  },
+  month: {
+    interval: eachMonthOfInterval,
+    start: startOfMonth,
+    end: endOfMonth,
+    labelFormat: 'MMM yyyy',
+  },
+  year: {
+    interval: eachYearOfInterval,
+    start: startOfYear,
+    end: endOfYear,
+    labelFormat: 'yyyy',
+  },
+};
+
+export async function getChartData(granularity, startDate, endDate) {
+  const config = bucketConfigs[granularity];
+  if (!config) throw new Error(`Invalid granularity: ${granularity}`);
+
+  const buckets = config.interval({ start: startDate, end: endDate }).map((date) => ({
+    label: format(date, config.labelFormat),
+    start: format(config.start(date), "yyyy-MM-dd'T'HH:mm:ss"),
+    end: format(config.end(date), "yyyy-MM-dd'T'HH:mm:ss"),
+  }));
+
+  const results = await Promise.all(
+    buckets.map(async (bucket) => {
+      const { data } = await supabase
+        .from('bills')
+        .select('total')
+        .gte('created_at', bucket.start)
+        .lte('created_at', bucket.end);
+      const total = data?.reduce((sum, b) => sum + parseFloat(b.total), 0) || 0;
+      const count = data?.length || 0;
+      return { label: bucket.label, total, count };
+    }),
+  );
+
+  return results;
+}
+
 export async function getStockReport() {
   const { data, error } = await supabase
     .from('medicine_stock_summary')
@@ -104,4 +177,13 @@ export async function getExpiryReport() {
     .order('expiry_date', { ascending: true });
   if (error) throw error;
   return data;
+}
+
+export async function getDashboardAlerts() {
+  const [lowStock, expiringSoon, expired] = await Promise.all([
+    getLowStockMedicines(),
+    getExpiringSoonBatches(),
+    getExpiredBatches(),
+  ]);
+  return { lowStock, expiringSoon, expired };
 }

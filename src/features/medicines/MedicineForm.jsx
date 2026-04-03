@@ -14,7 +14,7 @@ import {
   Alert,
 } from '@mui/material';
 
-export default function MedicineForm({ open, onClose, onSave, medicine, categories, loading }) {
+export default function MedicineForm({ open, onClose, onSave, medicine, prefill, categories, loading }) {
   const [form, setForm] = useState({
     name: '',
     generic_name: '',
@@ -43,7 +43,7 @@ export default function MedicineForm({ open, onClose, onSave, medicine, categori
       });
     } else {
       setForm({
-        name: '',
+        name: prefill?.name || '',
         generic_name: '',
         category_id: '',
         manufacturer: '',
@@ -55,7 +55,7 @@ export default function MedicineForm({ open, onClose, onSave, medicine, categori
       });
     }
     setError('');
-  }, [medicine, open]);
+  }, [medicine, prefill, open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -16,6 +16,7 @@ import ReportsPage from './features/reports/ReportsPage';
 import UsersPage from './features/users/UsersPage';
 import ProfilePage from './features/auth/ProfilePage';
 import MedicineLookupPage from './features/lookup/MedicineLookupPage';
+import AlertSettingsPage from './features/alerts/AlertSettingsPage';
 import NotFoundPage from './components/shared/NotFoundPage';
 import useAuthStore from './features/auth/authStore';
 import { ROLES } from './lib/constants';
@@ -44,11 +45,10 @@ function App() {
             {/* All authenticated routes */}
             <Route element={<AuthGuard />}>
               <Route element={<DashboardLayout />}>
-                <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route index element={<Navigate to="/medicine-lookup" replace />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/medicines" element={<MedicinesPage />} />
-                <Route path="/inventory" element={<InventoryPage />} />
                 <Route path="/medicine-lookup" element={<MedicineLookupPage />} />
                 <Route path="/alerts" element={<AlertsPage />} />
 
@@ -60,11 +60,14 @@ function App() {
                 {/* Admin only */}
                 <Route element={<AuthGuard allowedRoles={[ROLES.ADMIN]} />}>
                   <Route path="/suppliers" element={<SuppliersPage />} />
+                  <Route path="/alert-settings" element={<AlertSettingsPage />} />
                   <Route path="/users" element={<UsersPage />} />
                 </Route>
 
                 {/* Admin + Accountant */}
                 <Route element={<AuthGuard allowedRoles={[ROLES.ADMIN, ROLES.ACCOUNTANT]} />}>
+                  <Route path="/inventory" element={<Navigate to="/inventory/summary" replace />} />
+                  <Route path="/inventory/:section" element={<InventoryPage />} />
                   <Route path="/reports" element={<ReportsPage />} />
                 </Route>
 

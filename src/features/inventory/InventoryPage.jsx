@@ -3,14 +3,13 @@ import {
   Box,
   TextField,
   InputAdornment,
-  Tab,
   Alert,
   Snackbar,
   FormControlLabel,
   Switch,
 } from '@mui/material';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Search } from '@mui/icons-material';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import PageHeader from '../../components/shared/PageHeader';
 import BatchList from './BatchList';
 import BatchPricingDialog from './BatchPricingDialog';
@@ -28,11 +27,24 @@ import useRoleAccess from '../../hooks/useRoleAccess';
 import useAuthStore from '../auth/authStore';
 import { format } from 'date-fns';
 
+const VALID_SECTIONS = ['batches', 'summary', 'purchases', 'add-stock'];
+
+const SECTION_TITLES = {
+  batches: { title: 'Stock Batches', subtitle: 'View and manage stock batches' },
+  summary: { title: 'Stock Summary', subtitle: 'Medicine-wise stock overview' },
+  purchases: { title: 'Purchase History', subtitle: 'View past purchase entries' },
+  'add-stock': { title: 'Stock Batches', subtitle: 'View and manage stock batches' },
+};
+
 export default function InventoryPage() {
   const { canManageStock } = useRoleAccess();
   const { user } = useAuthStore();
+  const { section } = useParams();
+  const navigate = useNavigate();
 
-  const [tab, setTab] = useState('batches');
+  // Derive the active data tab from the URL section
+  const tab = section === 'add-stock' ? 'batches' : section;
+
   const [batches, setBatches] = useState([]);
   const [stockSummary, setStockSummary] = useState([]);
   const [purchases, setPurchases] = useState([]);
@@ -42,7 +54,7 @@ export default function InventoryPage() {
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
   const [showEmpty, setShowEmpty] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(section === 'add-stock');
   const [pricingBatch, setPricingBatch] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
@@ -69,6 +81,11 @@ export default function InventoryPage() {
       setLoading(false);
     }
   }, [tab, search, showEmpty]);
+
+  // Sync formOpen with URL section
+  useEffect(() => {
+    setFormOpen(section === 'add-stock');
+  }, [section]);
 
   useEffect(() => {
     const timer = setTimeout(fetchData, 300);
@@ -99,7 +116,7 @@ export default function InventoryPage() {
     try {
       await createPurchaseEntry({ ...entry, created_by: user.id }, items);
       showSnackbar('Purchase entry saved and stock updated');
-      setFormOpen(false);
+      navigate('/inventory/batches');
       fetchData();
     } catch (err) {
       if (err.message?.includes('row-level security') || err.code === '42501') {
@@ -207,25 +224,26 @@ export default function InventoryPage() {
     },
   ];
 
+  // Redirect invalid sections
+  if (!VALID_SECTIONS.includes(section)) {
+    return <Navigate to="/inventory/summary" replace />;
+  }
+
+  const { title, subtitle } = SECTION_TITLES[section] || SECTION_TITLES.batches;
+
   return (
     <Box>
       <PageHeader
-        title="Inventory"
-        subtitle="Track stock batches and purchases"
-        actionLabel={canManageStock ? 'Add Stock' : undefined}
-        onAction={() => setFormOpen(true)}
+        title={title}
+        subtitle={subtitle}
+        {...(section === 'summary' && canManageStock
+          ? { actionLabel: 'Add Stock', onAction: () => navigate('/inventory/add-stock') }
+          : {})}
       />
 
-      <TabContext value={tab}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-          <TabList onChange={(_, v) => setTab(v)}>
-            <Tab label="Stock Batches" value="batches" />
-            <Tab label="Stock Summary" value="summary" />
-            <Tab label="Purchase History" value="purchases" />
-          </TabList>
-        </Box>
-
-        <TabPanel value="batches" sx={{ p: 0 }}>
+      {/* Stock Batches content (also shown for add-stock) */}
+      {(tab === 'batches') && (
+        <>
           <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
             <TextField
               size="small"
@@ -259,22 +277,24 @@ export default function InventoryPage() {
             loading={loading}
             onEditPricing={canManageStock ? (batch) => setPricingBatch(batch) : undefined}
           />
-        </TabPanel>
+        </>
+      )}
 
-        <TabPanel value="summary" sx={{ p: 0 }}>
-          <DataTable
-            rows={stockSummary}
-            columns={summaryColumns}
-            loading={loading}
-            getRowId={(row) => row.medicine_id}
-            pageSize={25}
-          />
-        </TabPanel>
+      {/* Stock Summary content */}
+      {tab === 'summary' && (
+        <DataTable
+          rows={stockSummary}
+          columns={summaryColumns}
+          loading={loading}
+          getRowId={(row) => row.medicine_id}
+          pageSize={25}
+        />
+      )}
 
-        <TabPanel value="purchases" sx={{ p: 0 }}>
-          <DataTable rows={purchases} columns={purchaseColumns} loading={loading} />
-        </TabPanel>
-      </TabContext>
+      {/* Purchase History content */}
+      {tab === 'purchases' && (
+        <DataTable rows={purchases} columns={purchaseColumns} loading={loading} />
+      )}
 
       <BatchPricingDialog
         open={!!pricingBatch}
@@ -289,10 +309,18 @@ export default function InventoryPage() {
 
       <StockEntryForm
         open={formOpen}
-        onClose={() => setFormOpen(false)}
+        onClose={() => navigate('/inventory/summary')}
         onSave={handleSavePurchase}
         suppliers={suppliers}
         medicines={medicines}
+        onMedicineAdded={async () => {
+          try {
+            const medsData = await getMedicines();
+            setMedicines(medsData);
+          } catch {
+            // non-blocking
+          }
+        }}
         loading={saving}
       />
 

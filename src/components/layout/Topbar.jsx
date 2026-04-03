@@ -14,11 +14,14 @@ import {
 import { Menu as MenuIcon, Person, Logout } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DRAWER_WIDTH } from '../../lib/constants';
+import { DRAWER_WIDTH, DRAWER_WIDTH_COLLAPSED } from '../../lib/constants';
 import useAuthStore from '../../features/auth/authStore';
 import ConfirmDialog from '../shared/ConfirmDialog';
 
-export default function Topbar({ onMenuToggle }) {
+const drawerTransition = 'width 225ms cubic-bezier(0.4, 0, 0.2, 1), margin-left 225ms cubic-bezier(0.4, 0, 0.2, 1)';
+
+export default function Topbar({ onMenuToggle, collapsed }) {
+  const currentWidth = collapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH;
   const [anchorEl, setAnchorEl] = useState(null);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const navigate = useNavigate();
@@ -52,8 +55,9 @@ export default function Topbar({ onMenuToggle }) {
         color="inherit"
         elevation={0}
         sx={{
-          width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
-          ml: { md: `${DRAWER_WIDTH}px` },
+          width: { md: `calc(100% - ${currentWidth}px)` },
+          ml: { md: `${currentWidth}px` },
+          transition: { md: drawerTransition },
           borderBottom: '1px solid',
           borderColor: 'divider',
         }}

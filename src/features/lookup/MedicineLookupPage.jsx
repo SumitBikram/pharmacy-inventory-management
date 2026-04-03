@@ -235,7 +235,7 @@ export default function MedicineLookupPage() {
       )}
 
       {!selectedMedicine && !loading && (
-        <Box sx={{ mt: 10 }}>
+        <Box sx={{ mt: 15 }}>
           <LookupEmptyState expiryWarningDays={expiryWarningDays} />
         </Box>
       )}

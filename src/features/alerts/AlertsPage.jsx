@@ -6,14 +6,12 @@ import {
   CardContent,
   Typography,
   Grid,
-  TextField,
-  Button,
   Alert,
   Snackbar,
   Chip,
 } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { WarningAmber, EventBusy, Settings } from '@mui/icons-material';
+import { WarningAmber, EventBusy } from '@mui/icons-material';
 import { format, differenceInDays } from 'date-fns';
 import PageHeader from '../../components/shared/PageHeader';
 import DataTable from '../../components/shared/DataTable';
@@ -21,20 +19,14 @@ import {
   getLowStockMedicines,
   getExpiringSoonBatches,
   getExpiredBatches,
-  getAlertSettings,
-  updateAlertSetting,
 } from './alertService';
-import useRoleAccess from '../../hooks/useRoleAccess';
 
 export default function AlertsPage() {
-  const { isAdmin } = useRoleAccess();
   const [tab, setTab] = useState('low-stock');
   const [lowStock, setLowStock] = useState([]);
   const [expiringSoon, setExpiringSoon] = useState([]);
   const [expired, setExpired] = useState([]);
-  const [settings, setSettings] = useState({ low_stock_threshold: 20, expiry_warning_days: 90 });
   const [loading, setLoading] = useState(true);
-  const [savingSettings, setSavingSettings] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   const showSnackbar = (message, severity = 'success') => {
@@ -45,16 +37,14 @@ export default function AlertsPage() {
     async function fetchData() {
       setLoading(true);
       try {
-        const [lowData, expiringData, expiredData, settingsData] = await Promise.all([
+        const [lowData, expiringData, expiredData] = await Promise.all([
           getLowStockMedicines(),
           getExpiringSoonBatches(),
           getExpiredBatches(),
-          getAlertSettings(),
         ]);
         setLowStock(lowData);
         setExpiringSoon(expiringData);
         setExpired(expiredData);
-        setSettings((prev) => ({ ...prev, ...settingsData }));
       } catch (err) {
         showSnackbar(err.message, 'error');
       } finally {
@@ -63,21 +53,6 @@ export default function AlertsPage() {
     }
     fetchData();
   }, []);
-
-  const handleSaveSettings = async () => {
-    setSavingSettings(true);
-    try {
-      await Promise.all([
-        updateAlertSetting('low_stock_threshold', settings.low_stock_threshold),
-        updateAlertSetting('expiry_warning_days', settings.expiry_warning_days),
-      ]);
-      showSnackbar('Alert settings updated');
-    } catch (err) {
-      showSnackbar(err.message, 'error');
-    } finally {
-      setSavingSettings(false);
-    }
-  };
 
   const getMedicineDisplay = (_, row) => {
     if (!row.packing) return row.medicine_name;
@@ -231,9 +206,6 @@ export default function AlertsPage() {
             <Tab label={`Low Stock (${lowStock.length})`} value="low-stock" />
             <Tab label={`Expiring Soon (${expiringSoon.length})`} value="expiring" />
             <Tab label={`Expired (${expired.length})`} value="expired" />
-            {isAdmin && (
-              <Tab icon={<Settings />} iconPosition="start" label="Settings" value="settings" />
-            )}
           </TabList>
         </Box>
 
@@ -255,53 +227,6 @@ export default function AlertsPage() {
           <DataTable rows={expired} columns={expiryColumns} loading={loading} pageSize={25} />
         </TabPanel>
 
-        {isAdmin && (
-          <TabPanel value="settings" sx={{ p: 0 }}>
-            <Card sx={{ maxWidth: 500 }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Alert Thresholds
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-                  <TextField
-                    type="number"
-                    label="Low Stock Threshold (units)"
-                    value={settings.low_stock_threshold}
-                    onChange={(e) =>
-                      setSettings((s) => ({
-                        ...s,
-                        low_stock_threshold: parseInt(e.target.value, 10) || 0,
-                      }))
-                    }
-                    helperText="Medicines with stock at or below this number will trigger a low stock alert"
-                    slotProps={{ htmlInput: { min: 1 } }}
-                  />
-                  <TextField
-                    type="number"
-                    label="Expiry Warning (days before expiry)"
-                    value={settings.expiry_warning_days}
-                    onChange={(e) =>
-                      setSettings((s) => ({
-                        ...s,
-                        expiry_warning_days: parseInt(e.target.value, 10) || 0,
-                      }))
-                    }
-                    helperText="Batches expiring within this many days will trigger an alert"
-                    slotProps={{ htmlInput: { min: 1 } }}
-                  />
-                  <Button
-                    variant="contained"
-                    onClick={handleSaveSettings}
-                    disabled={savingSettings}
-                    sx={{ alignSelf: 'flex-start' }}
-                  >
-                    {savingSettings ? 'Saving...' : 'Save Settings'}
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </TabPanel>
-        )}
       </TabContext>
 
       <Snackbar

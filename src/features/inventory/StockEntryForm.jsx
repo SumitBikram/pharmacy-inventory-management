@@ -23,8 +23,11 @@ import {
   Paper,
   Autocomplete,
 } from '@mui/material';
-import { Add, Delete, UploadFile } from '@mui/icons-material';
+import { Add, Delete, UploadFile, Download, AddCircleOutline } from '@mui/icons-material';
 import parseExcelItems from './parseExcelItems';
+import downloadPurchaseTemplate from './downloadPurchaseTemplate';
+import MedicineForm from '../medicines/MedicineForm';
+import { createMedicine, getCategories } from '../medicines/medicineService';
 import { format, addMonths } from 'date-fns';
 
 const emptyItem = () => ({
@@ -90,7 +93,7 @@ function calculateLineAmount(item) {
   return qty * rate * (1 - discount / 100) * (1 + gst / 100);
 }
 
-export default function StockEntryForm({ open, onClose, onSave, suppliers, medicines, loading }) {
+export default function StockEntryForm({ open, onClose, onSave, suppliers, medicines, onMedicineAdded, loading }) {
   const [form, setForm] = useState({
     supplier_id: '',
     invoice_no: '',
@@ -101,6 +104,13 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
   const [error, setError] = useState('');
   const [importWarnings, setImportWarnings] = useState([]);
   const fileInputRef = useRef(null);
+
+  // Add-medicine dialog state
+  const [addMedOpen, setAddMedOpen] = useState(false);
+  const [addMedIndex, setAddMedIndex] = useState(null);
+  const [addMedPrefill, setAddMedPrefill] = useState(null);
+  const [addMedLoading, setAddMedLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     if (open) {
@@ -115,6 +125,43 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
       setImportWarnings([]);
     }
   }, [open]);
+
+  // Load categories when add-medicine dialog opens
+  useEffect(() => {
+    if (addMedOpen && categories.length === 0) {
+      getCategories().then(setCategories).catch(() => {});
+    }
+  }, [addMedOpen, categories.length]);
+
+  const handleAddMedicineOpen = (index, inputValue) => {
+    setAddMedIndex(index);
+    setAddMedPrefill({ name: inputValue || '' });
+    setAddMedOpen(true);
+  };
+
+  const handleAddMedicineSave = async (medicineData) => {
+    setAddMedLoading(true);
+    try {
+      const newMed = await createMedicine(medicineData);
+      // Auto-select the new medicine in the row
+      setItems((prev) => {
+        const updated = [...prev];
+        updated[addMedIndex] = {
+          ...updated[addMedIndex],
+          medicine_id: newMed.id,
+          medicine_name: newMed.name,
+          hsn_code: newMed.hsn_code || '',
+          packing: newMed.packing || '',
+        };
+        return updated;
+      });
+      // Notify parent to refresh medicines list
+      onMedicineAdded?.();
+      setAddMedOpen(false);
+    } finally {
+      setAddMedLoading(false);
+    }
+  };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -183,12 +230,21 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
     return items.reduce((sum, item) => sum + calculateLineAmount(item), 0);
   };
 
+  // Items that have data but no medicine_id (unmatched imports)
+  const unmatchedItems = items.filter((item) => !item.medicine_id && (item.medicine_name || item.batch_no || item.quantity));
+  const hasUnmatched = unmatchedItems.length > 0;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     if (!form.supplier_id) {
       setError('Please select a supplier');
+      return;
+    }
+
+    if (hasUnmatched) {
+      setError('Some items have unmatched medicines. Add them to the database before saving.');
       return;
     }
 
@@ -345,6 +401,13 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
               />
               <Button
                 size="small"
+                startIcon={<Download />}
+                onClick={downloadPurchaseTemplate}
+              >
+                Template
+              </Button>
+              <Button
+                size="small"
                 startIcon={<UploadFile />}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -433,25 +496,56 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
                     </TableCell>
                     {/* Medicine - sticky */}
                     <TableCell sx={{ ...bodyCellSx, ...makeStickyLeft('medicine') }}>
-                      <Autocomplete
-                        size="small"
-                        options={medicines}
-                        getOptionLabel={(opt) => {
-                          if (!opt.name) return '';
-                          if (!opt.packing) return opt.name;
-                          return `${opt.name} (${opt.packing}${opt.unit ? ' ' + opt.unit : ''})`;
-                        }}
-                        value={medicines.find((m) => m.id === item.medicine_id) || null}
-                        onChange={(_, val) => handleMedicineSelect(index, val)}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            placeholder="Search medicine"
-                            sx={inputSx}
-                          />
-                        )}
-                        isOptionEqualToValue={(opt, val) => opt.id === val.id}
-                      />
+                      {item.medicine_name && !item.medicine_id ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'error.main', fontWeight: 600, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                            noWrap
+                            title={item.medicine_name}
+                          >
+                            {item.medicine_name}
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => handleAddMedicineOpen(index, item.medicine_name)}
+                            title="Add this medicine"
+                          >
+                            <AddCircleOutline fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      ) : (
+                        <Autocomplete
+                          size="small"
+                          options={medicines}
+                          getOptionLabel={(opt) => {
+                            if (!opt.name) return '';
+                            if (!opt.packing) return opt.name;
+                            return `${opt.name} (${opt.packing}${opt.unit ? ' ' + opt.unit : ''})`;
+                          }}
+                          value={medicines.find((m) => m.id === item.medicine_id) || null}
+                          onChange={(_, val) => handleMedicineSelect(index, val)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Search medicine"
+                              sx={inputSx}
+                            />
+                          )}
+                          isOptionEqualToValue={(opt, val) => opt.id === val.id}
+                          noOptionsText={
+                            <Button
+                              size="small"
+                              startIcon={<AddCircleOutline />}
+                              onClick={() => handleAddMedicineOpen(index, '')}
+                              sx={{ textTransform: 'none' }}
+                            >
+                              Add new medicine
+                            </Button>
+                          }
+                        />
+                      )}
                     </TableCell>
                     {/* HSN - sticky, read-only */}
                     <TableCell sx={{ ...bodyCellSx, ...makeStickyLeft('hsn') }}>
@@ -606,18 +700,32 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
             </Box>
           </Box>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
+        <DialogActions sx={{ px: 3, pb: 2, flexWrap: 'wrap', gap: 1 }}>
+          {hasUnmatched && (
+            <Typography variant="caption" color="error" sx={{ flex: 1 }}>
+              {unmatchedItems.length} medicine(s) not in database — add them before saving
+            </Typography>
+          )}
           <Button onClick={onClose}>Cancel</Button>
           <Button
             type="submit"
             variant="contained"
-            disabled={loading}
+            disabled={loading || hasUnmatched}
             startIcon={loading ? <CircularProgress size={18} /> : null}
           >
             Save Purchase Entry
           </Button>
         </DialogActions>
       </form>
+
+      <MedicineForm
+        open={addMedOpen}
+        onClose={() => setAddMedOpen(false)}
+        onSave={handleAddMedicineSave}
+        prefill={addMedPrefill}
+        categories={categories}
+        loading={addMedLoading}
+      />
     </Dialog>
   );
 }
