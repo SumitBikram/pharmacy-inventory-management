@@ -15,11 +15,7 @@ import { WarningAmber, EventBusy } from '@mui/icons-material';
 import { format, differenceInDays } from 'date-fns';
 import PageHeader from '../../components/shared/PageHeader';
 import DataTable from '../../components/shared/DataTable';
-import {
-  getLowStockMedicines,
-  getExpiringSoonBatches,
-  getExpiredBatches,
-} from './alertService';
+import { getLowStockMedicines, getExpiringSoonBatches, getExpiredBatches } from './alertService';
 
 export default function AlertsPage() {
   const [tab, setTab] = useState('low-stock');
@@ -143,7 +139,7 @@ export default function AlertsPage() {
       field: 'selling_price',
       headerName: 'Selling Price',
       width: 110,
-      valueFormatter: (v) => v != null ? `\u20B9${parseFloat(v).toFixed(2)}` : '\u2014',
+      valueFormatter: (v) => (v != null ? `\u20B9${parseFloat(v).toFixed(2)}` : '\u2014'),
     },
   ];
 
@@ -226,7 +222,6 @@ export default function AlertsPage() {
         <TabPanel value="expired" sx={{ p: 0 }}>
           <DataTable rows={expired} columns={expiryColumns} loading={loading} pageSize={25} />
         </TabPanel>
-
       </TabContext>
 
       <Snackbar

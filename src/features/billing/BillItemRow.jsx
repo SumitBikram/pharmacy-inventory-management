@@ -56,7 +56,10 @@ export default function BillItemRow({ item, index, onUpdate, onRemove, canRemove
         const batchData = await getAvailableBatches(item.medicine_id);
         const totalQty = batchData.reduce((sum, b) => sum + b.quantity, 0);
         // FIFO: price from earliest-expiry batch
-        const price = batchData.length > 0 ? parseFloat(batchData[0].selling_price || batchData[0].mrp || 0) : 0;
+        const price =
+          batchData.length > 0
+            ? parseFloat(batchData[0].selling_price || batchData[0].mrp || 0)
+            : 0;
         setAvailableStock(totalQty);
         setUnitPrice(price);
         setBatches(batchData);
@@ -156,10 +159,16 @@ export default function BillItemRow({ item, index, onUpdate, onRemove, canRemove
                 }}
               >
                 <Typography variant="caption" color="text.secondary">
-                  {b.batch_no} | Exp: {format(new Date(b.expiry_date), 'MMM yyyy')} | Qty: {b.quantity} | ₹{parseFloat(b.selling_price || b.mrp || 0).toFixed(2)}
+                  {b.batch_no} | Exp: {format(new Date(b.expiry_date), 'MMM yyyy')} | Qty:{' '}
+                  {b.quantity} | ₹{parseFloat(b.selling_price || b.mrp || 0).toFixed(2)}
                 </Typography>
                 {i === 0 && (
-                  <Chip label="Sell First" size="small" color="success" sx={{ height: 18, fontSize: '0.65rem' }} />
+                  <Chip
+                    label="Sell First"
+                    size="small"
+                    color="success"
+                    sx={{ height: 18, fontSize: '0.65rem' }}
+                  />
                 )}
               </Box>
             ))}
@@ -186,9 +195,7 @@ export default function BillItemRow({ item, index, onUpdate, onRemove, canRemove
       </TableCell>
       <TableCell align="right">
         <Typography variant="body2">
-          {effectivePrice
-            ? `\u20B9${effectivePrice.toFixed(2)}`
-            : '—'}
+          {effectivePrice ? `\u20B9${effectivePrice.toFixed(2)}` : '—'}
         </Typography>
         {isZeroPrice && (
           <Typography variant="caption" color="warning.main" sx={{ display: 'block' }}>

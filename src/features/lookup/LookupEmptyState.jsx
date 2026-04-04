@@ -33,7 +33,9 @@ const getTips = (expiryDays) => [
     message: 'Tip: Follow First Expiry First Out',
     hint: (
       <>
-        The green <Chip label="Sell First" size="small" color="success" sx={{ fontSize: '0.7rem' }} /> badge highlights the earliest-expiry batch — dispense that one first
+        The green{' '}
+        <Chip label="Sell First" size="small" color="success" sx={{ fontSize: '0.7rem' }} /> badge
+        highlights the earliest-expiry batch — dispense that one first
       </>
     ),
   },
@@ -94,10 +96,10 @@ export default function LookupEmptyState({ expiryWarningDays = 90 }) {
       } while (next === prev && tips.length > 1);
       return next;
     });
-  }, []);
+  }, [tips.length]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const timer = globalThis.setInterval(() => {
       // Start slide-out
       setPhase('out');
       // After slide-out completes, swap tip and slide-in
@@ -107,7 +109,7 @@ export default function LookupEmptyState({ expiryWarningDays = 90 }) {
       }, SLIDE_DURATION);
     }, INTERVAL);
 
-    return () => clearInterval(timer);
+    return () => globalThis.clearInterval(timer);
   }, [pickNextIndex]);
 
   const { icon: IconComponent, message, hint } = tips[tipIndex];

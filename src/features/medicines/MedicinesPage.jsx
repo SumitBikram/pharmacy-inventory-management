@@ -80,8 +80,6 @@ export default function MedicinesPage() {
       setFormOpen(false);
       setEditingMedicine(null);
       fetchData();
-    } catch (err) {
-      throw err;
     } finally {
       setSaving(false);
     }

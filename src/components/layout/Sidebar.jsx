@@ -124,7 +124,9 @@ export default function Sidebar({ mobileOpen, onClose, collapsed, onToggleCollap
 
     return (
       <>
-        <Toolbar sx={{ px: isCollapsed ? '0 !important' : 2, justifyContent: 'center', minWidth: 0 }}>
+        <Toolbar
+          sx={{ px: isCollapsed ? '0 !important' : 2, justifyContent: 'center', minWidth: 0 }}
+        >
           <Box
             sx={{
               display: 'flex',
@@ -152,9 +154,7 @@ export default function Sidebar({ mobileOpen, onClose, collapsed, onToggleCollap
           {visibleItems.map((item) => {
             // Item with children (submenu)
             if (item.children) {
-              const isAnyChildActive = item.children.some(
-                (c) => location.pathname === c.path,
-              );
+              const isAnyChildActive = item.children.some((c) => location.pathname === c.path);
               const isOpen = openMenus[item.text] ?? isAnyChildActive;
 
               // Collapsed mode: show popover on click
@@ -293,7 +293,11 @@ export default function Sidebar({ mobileOpen, onClose, collapsed, onToggleCollap
               sx={{ display: 'flex', justifyContent: isCollapsed ? 'center' : 'flex-end', p: 1 }}
             >
               <IconButton onClick={onToggleCollapse} size="small">
-                {isCollapsed ? <KeyboardDoubleArrowRightRounded /> : <KeyboardDoubleArrowLeftRounded />}
+                {isCollapsed ? (
+                  <KeyboardDoubleArrowRightRounded />
+                ) : (
+                  <KeyboardDoubleArrowLeftRounded />
+                )}
               </IconButton>
             </Box>
           </>

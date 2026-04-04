@@ -69,7 +69,8 @@ export default function BatchPricingDialog({ open, batch, onClose, onSaved }) {
           {batch.medicine?.name || 'Medicine'}
         </Typography>
         <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
-          Batch: {batch.batch_no} &middot; Expiry: {format(new Date(batch.expiry_date), 'dd MMM yyyy')} &middot; Qty: {batch.quantity}
+          Batch: {batch.batch_no} &middot; Expiry:{' '}
+          {format(new Date(batch.expiry_date), 'dd MMM yyyy')} &middot; Qty: {batch.quantity}
         </Typography>
 
         <Grid container spacing={2} sx={{ mt: 0.5 }}>

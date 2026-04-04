@@ -100,7 +100,11 @@ export default function BillDetailDialog({ open, billId, onClose }) {
               {bill.items?.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
-                    {formatMedicineName(item.medicine?.name, item.medicine?.packing, item.medicine?.unit)}
+                    {formatMedicineName(
+                      item.medicine?.name,
+                      item.medicine?.packing,
+                      item.medicine?.unit,
+                    )}
                     {item.medicine?.generic_name && (
                       <Typography variant="caption" display="block" color="text.secondary">
                         {item.medicine.generic_name}

@@ -130,7 +130,15 @@ export default function MedicineLookupPage() {
         <Typography
           variant="body2"
           fontWeight={600}
-          color={value < 0 ? 'error.main' : value <= 30 ? 'error.main' : value <= 90 ? 'warning.main' : 'success.main'}
+          color={
+            value < 0
+              ? 'error.main'
+              : value <= 30
+                ? 'error.main'
+                : value <= 90
+                  ? 'warning.main'
+                  : 'success.main'
+          }
         >
           {value < 0 ? `${Math.abs(value)}d overdue` : `${value}d`}
         </Typography>
@@ -153,7 +161,7 @@ export default function MedicineLookupPage() {
       field: 'selling_price',
       headerName: 'Selling Price',
       width: 120,
-      valueFormatter: (v) => v != null ? `\u20B9${parseFloat(v).toFixed(2)}` : '\u2014',
+      valueFormatter: (v) => (v != null ? `\u20B9${parseFloat(v).toFixed(2)}` : '\u2014'),
     },
     {
       field: 'mrp',
@@ -176,7 +184,9 @@ export default function MedicineLookupPage() {
       renderCell: ({ row }) => {
         const idx = batches.findIndex((b) => b.id === row.id);
         if (idx === firstValidIndex && firstValidIndex >= 0) {
-          return <Chip label="Sell First" size="small" color="success" sx={{ fontSize: '0.7rem' }} />;
+          return (
+            <Chip label="Sell First" size="small" color="success" sx={{ fontSize: '0.7rem' }} />
+          );
         }
         return null;
       },
@@ -272,12 +282,19 @@ export default function MedicineLookupPage() {
                   <Typography
                     variant="h4"
                     fontWeight={700}
-                    color={availableStock === 0 ? 'error.main' : availableStock <= 20 ? 'warning.main' : 'success.main'}
+                    color={
+                      availableStock === 0
+                        ? 'error.main'
+                        : availableStock <= 20
+                          ? 'warning.main'
+                          : 'success.main'
+                    }
                   >
                     {availableStock}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    across {batches.filter((b) => new Date(b.expiry_date) > today).length} active batch(es)
+                    across {batches.filter((b) => new Date(b.expiry_date) > today).length} active
+                    batch(es)
                   </Typography>
                 </Grid>
               </Grid>

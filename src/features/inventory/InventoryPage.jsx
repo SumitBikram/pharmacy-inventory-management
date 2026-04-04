@@ -99,7 +99,7 @@ export default function InventoryPage() {
         const [medsData, suppData] = await Promise.all([getMedicines(), getSuppliers()]);
         setMedicines(medsData);
         setSuppliers(suppData);
-      } catch (err) {
+      } catch {
         // non-blocking
       }
     }
@@ -242,7 +242,7 @@ export default function InventoryPage() {
       />
 
       {/* Stock Batches content (also shown for add-stock) */}
-      {(tab === 'batches') && (
+      {tab === 'batches' && (
         <>
           <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
             <TextField

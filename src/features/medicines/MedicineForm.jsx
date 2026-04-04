@@ -14,7 +14,15 @@ import {
   Alert,
 } from '@mui/material';
 
-export default function MedicineForm({ open, onClose, onSave, medicine, prefill, categories, loading }) {
+export default function MedicineForm({
+  open,
+  onClose,
+  onSave,
+  medicine,
+  prefill,
+  categories,
+  loading,
+}) {
   const [form, setForm] = useState({
     name: '',
     generic_name: '',

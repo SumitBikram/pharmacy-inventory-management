@@ -93,7 +93,15 @@ function calculateLineAmount(item) {
   return qty * rate * (1 - discount / 100) * (1 + gst / 100);
 }
 
-export default function StockEntryForm({ open, onClose, onSave, suppliers, medicines, onMedicineAdded, loading }) {
+export default function StockEntryForm({
+  open,
+  onClose,
+  onSave,
+  suppliers,
+  medicines,
+  onMedicineAdded,
+  loading,
+}) {
   const [form, setForm] = useState({
     supplier_id: '',
     invoice_no: '',
@@ -129,7 +137,9 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
   // Load categories when add-medicine dialog opens
   useEffect(() => {
     if (addMedOpen && categories.length === 0) {
-      getCategories().then(setCategories).catch(() => {});
+      getCategories()
+        .then(setCategories)
+        .catch(() => {});
     }
   }, [addMedOpen, categories.length]);
 
@@ -231,7 +241,9 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
   };
 
   // Items that have data but no medicine_id (unmatched imports)
-  const unmatchedItems = items.filter((item) => !item.medicine_id && (item.medicine_name || item.batch_no || item.quantity));
+  const unmatchedItems = items.filter(
+    (item) => !item.medicine_id && (item.medicine_name || item.batch_no || item.quantity),
+  );
   const hasUnmatched = unmatchedItems.length > 0;
 
   const handleSubmit = async (e) => {
@@ -399,11 +411,7 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
                 onChange={handleExcelImport}
                 style={{ display: 'none' }}
               />
-              <Button
-                size="small"
-                startIcon={<Download />}
-                onClick={downloadPurchaseTemplate}
-              >
+              <Button size="small" startIcon={<Download />} onClick={downloadPurchaseTemplate}>
                 Template
               </Button>
               <Button
@@ -463,9 +471,7 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
                   <TableCell sx={headCellSx}>Sch%</TableCell>
                   <TableCell sx={headCellSx}>GST%</TableCell>
                   <TableCell sx={headCellSx}>Amount</TableCell>
-                  <TableCell
-                    sx={{ ...headCellSx, ...stickyRightSx, zIndex: 3 }}
-                  ></TableCell>
+                  <TableCell sx={{ ...headCellSx, ...stickyRightSx, zIndex: 3 }}></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -500,7 +506,13 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                           <Typography
                             variant="caption"
-                            sx={{ color: 'error.main', fontWeight: 600, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                            sx={{
+                              color: 'error.main',
+                              fontWeight: 600,
+                              flex: 1,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
                             noWrap
                             title={item.medicine_name}
                           >
@@ -527,11 +539,7 @@ export default function StockEntryForm({ open, onClose, onSave, suppliers, medic
                           value={medicines.find((m) => m.id === item.medicine_id) || null}
                           onChange={(_, val) => handleMedicineSelect(index, val)}
                           renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Search medicine"
-                              sx={inputSx}
-                            />
+                            <TextField {...params} placeholder="Search medicine" sx={inputSx} />
                           )}
                           isOptionEqualToValue={(opt, val) => opt.id === val.id}
                           noOptionsText={

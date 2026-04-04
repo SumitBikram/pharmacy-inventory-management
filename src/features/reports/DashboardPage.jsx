@@ -260,7 +260,16 @@ export default function DashboardPage() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, flexWrap: 'wrap', gap: 1.5 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          mb: 2,
+          flexWrap: 'wrap',
+          gap: 1.5,
+        }}
+      >
         <Box>
           <Typography variant="h5">Dashboard</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -339,8 +348,23 @@ export default function DashboardPage() {
                   py: 0.5,
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: 'text.secondary' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: item.color, bgcolor: `${item.color}15`, borderRadius: '50%', p: 0.6, fontSize: 'inherit' }}>{item.icon}</Box>
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: 'text.secondary' }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: item.color,
+                      bgcolor: `${item.color}15`,
+                      borderRadius: '50%',
+                      p: 0.6,
+                      fontSize: 'inherit',
+                    }}
+                  >
+                    {item.icon}
+                  </Box>
                   <Typography variant="body2" color="text.secondary">
                     {item.title}
                   </Typography>
@@ -355,14 +379,28 @@ export default function DashboardPage() {
 
         {showAlerts && (
           <Grid size={{ xs: 12, md: 6 }}>
-            <Card sx={{ px: 2, py: 1.5, borderTop: '3px solid #D32F2F', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+            <Card
+              sx={{
+                px: 2,
+                py: 1.5,
+                borderTop: '3px solid #D32F2F',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  mb: 0.5,
+                }}
+              >
                 <Typography variant="subtitle1" fontWeight={700}>
                   Alerts
                 </Typography>
-                {totalAlertCount > 0 && (
-                  <Chip label={totalAlertCount} size="small" color="error" />
-                )}
+                {totalAlertCount > 0 && <Chip label={totalAlertCount} size="small" color="error" />}
               </Box>
 
               {totalAlertCount === 0 ? (
@@ -386,14 +424,16 @@ export default function DashboardPage() {
                   </Typography>
                 </Box>
               ) : (
-                <Box sx={{
-                  flexGrow: 1,
-                  overflowY: 'auto',
-                  maxHeight: 160,
-                  pr: 1.5,
-                  '&::-webkit-scrollbar': { width: 4 },
-                  '&::-webkit-scrollbar-thumb': { bgcolor: 'divider', borderRadius: 2 },
-                }}>
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    overflowY: 'auto',
+                    maxHeight: 160,
+                    pr: 1.5,
+                    '&::-webkit-scrollbar': { width: 4 },
+                    '&::-webkit-scrollbar-thumb': { bgcolor: 'divider', borderRadius: 2 },
+                  }}
+                >
                   {displayedAlerts.map((alert, idx) => (
                     <Box
                       key={idx}
@@ -404,11 +444,30 @@ export default function DashboardPage() {
                         py: 0.5,
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: alert.color, bgcolor: `${alert.color}15`, borderRadius: '50%', p: 0.5, flexShrink: 0, fontSize: 14 }}>{alert.icon}</Box>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: alert.color,
+                          bgcolor: `${alert.color}15`,
+                          borderRadius: '50%',
+                          p: 0.5,
+                          flexShrink: 0,
+                          fontSize: 14,
+                        }}
+                      >
+                        {alert.icon}
+                      </Box>
                       <Typography variant="body2" noWrap sx={{ flexGrow: 1, minWidth: 0 }}>
                         {alert.name}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary" noWrap sx={{ flexShrink: 0 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        noWrap
+                        sx={{ flexShrink: 0 }}
+                      >
                         {alert.detail}
                       </Typography>
                     </Box>
@@ -428,8 +487,6 @@ export default function DashboardPage() {
             </Card>
           </Grid>
         )}
-
-
 
         {/* Row 2: Charts */}
         {showSalesChart && (
@@ -476,9 +533,7 @@ export default function DashboardPage() {
                     tick={axisStyle}
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={(v) =>
-                      `\u20B9${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`
-                    }
+                    tickFormatter={(v) => `\u20B9${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
                   />
                   <Tooltip
                     content={<ChartTooltip />}
@@ -535,12 +590,7 @@ export default function DashboardPage() {
                     tickLine={false}
                     {...(isDailyGranularity && { angle: -45, textAnchor: 'end', height: 60 })}
                   />
-                  <YAxis
-                    tick={axisStyle}
-                    axisLine={false}
-                    tickLine={false}
-                    allowDecimals={false}
-                  />
+                  <YAxis tick={axisStyle} axisLine={false} tickLine={false} allowDecimals={false} />
                   <Tooltip content={<ChartTooltip />} />
                   <Line
                     type="monotone"
