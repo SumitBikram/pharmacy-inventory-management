@@ -1,87 +1,49 @@
 import { supabase } from '../../lib/supabase';
 
-export async function getMedicines({ search = '', categoryId = '', activeOnly = true } = {}) {
-  let query = supabase.from('medicines').select('*, category:categories(id, name)').order('name');
-
-  if (search) {
-    query = query.or(
-      `name.ilike.%${search}%,generic_name.ilike.%${search}%,manufacturer.ilike.%${search}%`,
-    );
-  }
-  if (categoryId) {
-    query = query.eq('category_id', categoryId);
-  }
-  if (activeOnly) {
-    query = query.eq('is_active', true);
-  }
-
-  const { data, error } = await query;
+// Helper: invoke an Edge Function and return the parsed response
+async function invoke(fnName, body) {
+  const { data, error } = await supabase.functions.invoke(fnName, { body });
   if (error) throw error;
+  if (data?.error) throw new Error(data.error);
   return data;
+}
+
+// --- Medicines ---
+
+export async function getMedicines({ search = '', categoryId = '', activeOnly = true } = {}) {
+  return invoke('medicines', { action: 'list', search, categoryId, activeOnly });
 }
 
 export async function getMedicine(id) {
-  const { data, error } = await supabase
-    .from('medicines')
-    .select('*, category:categories(id, name)')
-    .eq('id', id)
-    .single();
-  if (error) throw error;
-  return data;
+  return invoke('medicines', { action: 'get', id });
 }
 
 export async function createMedicine(medicine) {
-  const { data, error } = await supabase
-    .from('medicines')
-    .insert(medicine)
-    .select('*, category:categories(id, name)')
-    .single();
-  if (error) throw error;
-  return data;
+  return invoke('medicines', { action: 'create', medicine });
 }
 
 export async function updateMedicine(id, updates) {
-  const { data, error } = await supabase
-    .from('medicines')
-    .update(updates)
-    .eq('id', id)
-    .select('*, category:categories(id, name)')
-    .single();
-  if (error) throw error;
-  return data;
+  return invoke('medicines', { action: 'update', id, updates });
 }
 
 export async function deleteMedicine(id) {
-  const { error } = await supabase.from('medicines').update({ is_active: false }).eq('id', id);
-  if (error) throw error;
+  return invoke('medicines', { action: 'delete', id });
 }
 
 // --- Categories ---
 
 export async function getCategories() {
-  const { data, error } = await supabase.from('categories').select('*').order('name');
-  if (error) throw error;
-  return data;
+  return invoke('categories', { action: 'list' });
 }
 
 export async function createCategory(category) {
-  const { data, error } = await supabase.from('categories').insert(category).select().single();
-  if (error) throw error;
-  return data;
+  return invoke('categories', { action: 'create', category });
 }
 
 export async function updateCategory(id, updates) {
-  const { data, error } = await supabase
-    .from('categories')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
+  return invoke('categories', { action: 'update', id, updates });
 }
 
 export async function deleteCategory(id) {
-  const { error } = await supabase.from('categories').delete().eq('id', id);
-  if (error) throw error;
+  return invoke('categories', { action: 'delete', id });
 }

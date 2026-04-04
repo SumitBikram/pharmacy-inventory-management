@@ -3,12 +3,10 @@ import { supabase } from '../../lib/supabase';
 export { searchMedicinesWithStock } from '../billing/billingService';
 
 export async function getMedicineBatchDetails(medicineId) {
-  const { data, error } = await supabase
-    .from('stock_batches')
-    .select('id, batch_no, expiry_date, quantity, selling_price, mrp, supplier:suppliers(name)')
-    .eq('medicine_id', medicineId)
-    .gt('quantity', 0)
-    .order('expiry_date', { ascending: true });
+  const { data, error } = await supabase.functions.invoke('inventory', {
+    body: { action: 'getMedicineBatchDetails', medicineId },
+  });
   if (error) throw error;
+  if (data?.error) throw new Error(data.error);
   return data;
 }

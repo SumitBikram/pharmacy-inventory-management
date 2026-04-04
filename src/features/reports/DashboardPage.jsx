@@ -111,7 +111,7 @@ function buildAlertMessages(alerts) {
     messages.push({
       icon: <ErrorOutline fontSize="small" />,
       color: '#D32F2F',
-      name: item.medicine?.name || 'Unknown',
+      name: item.medicine_name || 'Unknown',
       detail: `expired (batch: ${item.batch_no})`,
     });
   });

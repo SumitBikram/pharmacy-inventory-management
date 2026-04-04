@@ -1,50 +1,28 @@
 import { supabase } from '../../lib/supabase';
 
-export async function getLowStockMedicines() {
-  const { data, error } = await supabase
-    .from('low_stock_medicines')
-    .select('*')
-    .order('total_stock', { ascending: true });
+async function invoke(body) {
+  const { data, error } = await supabase.functions.invoke('alerts', { body });
   if (error) throw error;
+  if (data?.error) throw new Error(data.error);
   return data;
+}
+
+export async function getLowStockMedicines() {
+  return invoke({ action: 'getLowStock' });
 }
 
 export async function getExpiringSoonBatches() {
-  const { data, error } = await supabase
-    .from('expiring_soon_batches')
-    .select('*')
-    .order('expiry_date', { ascending: true });
-  if (error) throw error;
-  return data;
+  return invoke({ action: 'getExpiringSoon' });
 }
 
 export async function getExpiredBatches() {
-  const { data, error } = await supabase
-    .from('stock_batches')
-    .select('*, medicine:medicines(id, name, generic_name, packing, unit)')
-    .gt('quantity', 0)
-    .lte('expiry_date', new Date().toISOString().split('T')[0])
-    .order('expiry_date', { ascending: true });
-  if (error) throw error;
-  return data;
+  return invoke({ action: 'getExpired' });
 }
 
 export async function getAlertSettings() {
-  const { data, error } = await supabase
-    .from('settings')
-    .select('*')
-    .in('key', ['low_stock_threshold', 'expiry_warning_days']);
-  if (error) throw error;
-  const settings = {};
-  data.forEach((row) => {
-    settings[row.key] = typeof row.value === 'string' ? parseInt(row.value, 10) : row.value;
-  });
-  return settings;
+  return invoke({ action: 'getSettings' });
 }
 
 export async function updateAlertSetting(key, value) {
-  const { error } = await supabase
-    .from('settings')
-    .upsert({ key, value, updated_at: new Date().toISOString() });
-  if (error) throw error;
+  return invoke({ action: 'updateSetting', key, value });
 }

@@ -54,6 +54,22 @@ const theme = createTheme({
         },
       },
     },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          fontFamily: '"Nunito", "Roboto", "Helvetica", "Arial", sans-serif',
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        notchedOutline: {
+          '& legend': {
+            fontFamily: '"Nunito", "Roboto", "Helvetica", "Arial", sans-serif',
+          },
+        },
+      },
+    },
     MuiTableHead: {
       styleOverrides: {
         root: {

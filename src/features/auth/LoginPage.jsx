@@ -188,7 +188,7 @@ export default function LoginPage() {
           {[
             {
               icon: <SiGmail size={16} />,
-              href: 'mailto:dev.sumitbm@gmail.com',
+              href: "mailto:dev.sumitbm@gmail.com?subject=Project%20Inquiry&body=Hi%20Sumit,%0A%0AI%20am%20interested%20in%20your%20project.%0APlease%20share%20more%20details.%0A%0AThanks",
               label: 'Email',
               hoverColor: '#EA4335',
             },

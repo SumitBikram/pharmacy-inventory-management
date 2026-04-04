@@ -76,15 +76,25 @@ INSERT INTO public.users (id, email, full_name, role)
 VALUES ('YOUR-UUID', 'your-email@example.com', 'Your Name', 'admin');
 ```
 
-### 5. Deploy the Edge Function
+### 5. Deploy Edge Functions
 
-```bash
-npx supabase login --token YOUR_ACCESS_TOKEN
-npx supabase link --project-ref YOUR_PROJECT_REF
-npx supabase functions deploy create-user
-```
+Edge Functions are deployed and managed directly via **Supabase Dashboard > Edge Functions**. The function code lives on Supabase's servers, not in this repository.
 
-This enables in-app user creation by admins.
+Ensure **"Verify JWT"** is **OFF** for all functions (auth is handled in function code).
+
+| Function | Purpose |
+| --- | --- |
+| `create-user` | Secure user creation by admins (uses service role to create auth + profile) |
+| `medicines` | Server-side CRUD proxy for medicines (list, get, create, update, soft-delete) |
+| `categories` | Server-side CRUD proxy for categories (list, create, update, delete) |
+| `suppliers` | Server-side CRUD proxy for suppliers (list, get, create, update, soft-delete) |
+| `inventory` | Stock batches, purchase entries, batch pricing, and lookup queries |
+| `billing` | Medicine search, FIFO billing, bill history and details |
+| `alerts` | Low stock, expiring/expired batches, and alert settings |
+| `reports` | Dashboard stats, daily/monthly sales, charts, stock and expiry reports |
+| `users` | User list, update, activate/deactivate, and profile fetch |
+
+These Edge Functions act as a server-side proxy — the browser only sees `POST /functions/v1/<name>`, hiding table names, query structure, and credentials from DevTools.
 
 ### 6. Run the app
 
@@ -156,9 +166,8 @@ supabase/
 ├── schema.sql                # Database schema
 ├── fix_rls_policies.sql      # RLS recursion fix
 ├── seed.sql                  # Sample data
-├── seed_suppliers.sql        # Sample suppliers
-└── functions/
-    └── create-user/          # Edge Function for user creation
+└── seed_suppliers.sql        # Sample suppliers
+# Edge Functions are deployed on Supabase Dashboard (not stored locally)
 ```
 
 ## Scripts

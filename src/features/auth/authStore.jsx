@@ -37,9 +37,15 @@ const useAuthStore = create((set, get) => ({
   },
 
   fetchProfile: async (userId) => {
-    const { data, error } = await supabase.from('users').select('*').eq('id', userId).single();
+    const { data, error } = await supabase.functions.invoke('users', {
+      body: { action: 'fetchProfile', userId },
+    });
     if (error) {
       console.error('Error fetching profile:', error.message);
+      return null;
+    }
+    if (data?.error) {
+      console.error('Error fetching profile:', data.error);
       return null;
     }
     return data;
