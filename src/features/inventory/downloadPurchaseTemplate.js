@@ -21,18 +21,18 @@ const EXAMPLE_ROWS = [
 ];
 
 const COL_WIDTHS = [
-  { wch: 6 },   // Qty
-  { wch: 8 },   // Packing
-  { wch: 28 },  // Medicine Description
-  { wch: 8 },   // HSN
-  { wch: 16 },  // Batch No
-  { wch: 14 },  // Expiry Date
-  { wch: 10 },  // Old MRP
-  { wch: 10 },  // MRP
-  { wch: 10 },  // Rate
-  { wch: 10 },  // Discount%
-  { wch: 8 },   // Sch%
-  { wch: 8 },   // GST%
+  { wch: 6 }, // Qty
+  { wch: 8 }, // Packing
+  { wch: 28 }, // Medicine Description
+  { wch: 8 }, // HSN
+  { wch: 16 }, // Batch No
+  { wch: 14 }, // Expiry Date
+  { wch: 10 }, // Old MRP
+  { wch: 10 }, // MRP
+  { wch: 10 }, // Rate
+  { wch: 10 }, // Discount%
+  { wch: 8 }, // Sch%
+  { wch: 8 }, // GST%
 ];
 
 export default function downloadPurchaseTemplate() {

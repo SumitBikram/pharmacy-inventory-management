@@ -57,7 +57,8 @@ export default function BatchList({ batches, loading, onEditPricing }) {
       field: 'selling_price',
       headerName: 'Selling Price',
       width: 120,
-      valueFormatter: (value) => value != null ? `\u20B9${parseFloat(value).toFixed(2)}` : '\u2014',
+      valueFormatter: (value) =>
+        value != null ? `\u20B9${parseFloat(value).toFixed(2)}` : '\u2014',
     },
     {
       field: 'mrp',

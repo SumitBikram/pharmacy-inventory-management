@@ -85,14 +85,15 @@ export default function ExpiryReport() {
       field: 'selling_price',
       headerName: 'Selling Price',
       width: 110,
-      valueFormatter: (v) => v != null ? `\u20B9${parseFloat(v).toFixed(2)}` : '\u2014',
+      valueFormatter: (v) => (v != null ? `\u20B9${parseFloat(v).toFixed(2)}` : '\u2014'),
     },
     {
       field: 'stock_value',
       headerName: 'Stock Value',
       width: 120,
-      valueGetter: (_, row) => row.selling_price != null ? row.quantity * parseFloat(row.selling_price) : null,
-      valueFormatter: (v) => v != null ? `\u20B9${v.toFixed(2)}` : '\u2014',
+      valueGetter: (_, row) =>
+        row.selling_price != null ? row.quantity * parseFloat(row.selling_price) : null,
+      valueFormatter: (v) => (v != null ? `\u20B9${v.toFixed(2)}` : '\u2014'),
     },
   ];
 

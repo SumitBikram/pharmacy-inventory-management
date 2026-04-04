@@ -111,7 +111,7 @@ function parseNumber(value) {
  */
 export default function parseExcelItems(file, medicines) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+    const reader = new globalThis.FileReader();
     reader.onload = (e) => {
       try {
         const workbook = read(e.target.result, { type: 'array' });
